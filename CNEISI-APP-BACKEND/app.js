@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const UsuariosRouter = require('./routes/Users');
-const EventosRouter = require('./routes/Events');
-const InscripcionesRouter = require('./routes/Inscriptions');
+const UsuariosRouter = require('./routes/Usuarios');
+const EventosRouter = require('./routes/Eventos');
+const InscripcionesRouter = require('./routes/Inscripciones');
 const { sequelize } = require('./models')
 const app = express();
 const PORT = 3000;
