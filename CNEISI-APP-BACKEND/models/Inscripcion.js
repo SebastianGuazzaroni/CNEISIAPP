@@ -25,6 +25,15 @@ module.exports = (sequelize) => {
                 key: 'id'
             }
         }
+        ,
+        usuarioId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'Usuarios',
+                key: 'id'
+            }
+        }
     },{
         timestamps: false,
         tableName: 'Inscripciones'

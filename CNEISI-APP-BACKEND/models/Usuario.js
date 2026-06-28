@@ -20,6 +20,15 @@ module.exports = (sequelize) => {
         password: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        legajo: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        rol: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            defaultValue: 'participant'
         }
     },
         {

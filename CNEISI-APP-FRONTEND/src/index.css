@@ -1,3 +1,15 @@
-:root {
+html {
+  min-height: 100%;
+  background: #fff;
+}
 
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #fff;
+}
+
+#root {
+  min-height: 100vh;
 }
