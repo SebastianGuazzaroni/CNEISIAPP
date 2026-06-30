@@ -1,6 +1,6 @@
 import React from 'react'
 import SectionTitle from './SectionTitle'
-import EventCard from './EventCard'
+import EventCard from './eventCard'
 
 export default function EventCards({ events, mode, onAction, title }) {
   return (
