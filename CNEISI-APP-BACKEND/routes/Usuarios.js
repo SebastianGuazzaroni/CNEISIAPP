@@ -4,11 +4,21 @@ const { Usuario } = require('../models');
 
 const router = express.Router();
 
+function normalizeLegajo(value) {
+  if (value === undefined || value === null) return undefined;
+  const normalized = String(value).trim();
+  return normalized === '' ? null : normalized;
+}
+
 const usuarioCreateValidators = [
   body('nombreApellido').trim().notEmpty().withMessage('El nombre es requerido.'),
   body('email').trim().isEmail().withMessage('Email inválido.'),
   body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres.'),
-  body('legajo').trim().isNumeric().withMessage('El legajo debe contener sólo números.'),
+  body('legajo').optional({ nullable: true }).trim().custom((value) => {
+    if (value === undefined || value === null || value === '') return true;
+    if (/^\d+$/.test(value)) return true;
+    throw new Error('El legajo debe contener sólo números.');
+  }),
 ];
 
 const usuarioUpdateValidators = [
@@ -16,7 +26,11 @@ const usuarioUpdateValidators = [
   body('nombreApellido').optional().trim().notEmpty().withMessage('El nombre no puede estar vacío.'),
   body('email').optional().trim().isEmail().withMessage('Email inválido.'),
   body('password').optional().isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres.'),
-  body('legajo').optional().trim().isNumeric().withMessage('El legajo debe contener sólo números.'),
+  body('legajo').optional({ nullable: true }).trim().custom((value) => {
+    if (value === undefined || value === null || value === '') return true;
+    if (/^\d+$/.test(value)) return true;
+    throw new Error('El legajo debe contener sólo números.');
+  }),
 ];
 
 function handleValidation(req, res, next) {
@@ -59,19 +73,16 @@ router.post('/', usuarioCreateValidators, handleValidation, async (req, res) => 
     const { nombreApellido, email, password, legajo, rol } = req.body;
     const normalizedEmail = String(email).trim().toLowerCase();
     const normalizedName = String(nombreApellido).trim();
-    const normalizedLegajo = String(legajo).trim();
+    const normalizedLegajo = normalizeLegajo(legajo);
 
     const existing = await Usuario.findOne({
       where: {
-        [require('sequelize').Op.or]: [
-          { email: normalizedEmail },
-          { legajo: normalizedLegajo },
-        ],
+        email: normalizedEmail,
       },
     });
 
     if (existing) {
-      return res.status(409).json({ message: 'Email o legajo ya registrado.' });
+      return res.status(409).json({ message: 'Email ya registrado.' });
     }
 
     const usuario = await Usuario.create({
@@ -105,7 +116,7 @@ router.put('/:id', usuarioUpdateValidators, handleValidation, async (req, res) =
     if (nombreApellido !== undefined) updateData.nombreApellido = String(nombreApellido).trim();
     if (email !== undefined) updateData.email = String(email).trim().toLowerCase();
     if (password !== undefined) updateData.password = password;
-    if (legajo !== undefined) updateData.legajo = String(legajo).trim();
+    if (legajo !== undefined) updateData.legajo = normalizeLegajo(legajo);
     if (rol !== undefined) updateData.rol = rol;
 
     if (updateData.email || updateData.legajo) {

@@ -23,7 +23,7 @@ module.exports = (sequelize) => {
         },
         legajo: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         rol: {
             type: DataTypes.STRING,

@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import StatusBar from '../components/StatusBar'
 import Logo from '../components/Logo'
 
+
 export default function RegisterPage({ onBack, onSubmit, onSuccess, onGoogle }) {
-  const [form, setForm] = useState({ nombreApellido: '', email: '', password: '', legajo: '' })
+  const [form, setForm] = useState({ nombreApellido: '', email: '', password: ''})
   const [error, setError] = useState('')
 
   function handleChange(field, value) {
@@ -16,9 +17,10 @@ export default function RegisterPage({ onBack, onSubmit, onSuccess, onGoogle }) 
     const nombreApellido = form.nombreApellido.trim()
     const email = form.email.trim()
     const password = form.password
-    const legajo = form.legajo.trim()
 
-    if (!nombreApellido || !email || !password || !legajo) {
+    
+
+    if (!nombreApellido || !email || !password) {
       setError('Completa todos los campos para registrarte')
       return
     }
@@ -30,11 +32,6 @@ export default function RegisterPage({ onBack, onSubmit, onSuccess, onGoogle }) 
 
     if (password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres')
-      return
-    }
-
-    if (!/^\d+$/.test(legajo)) {
-      setError('El legajo debe contener sólo números')
       return
     }
 
@@ -75,12 +72,6 @@ export default function RegisterPage({ onBack, onSubmit, onSuccess, onGoogle }) 
           type="password"
           value={form.password}
           onChange={(event) => handleChange('password', event.target.value)}
-        />
-        <input
-          placeholder="Legajo"
-          type="text"
-          value={form.legajo}
-          onChange={(event) => handleChange('legajo', event.target.value)}
         />
         {error ? <span className="login-error">{error}</span> : null}
         <button className="primary-button" type="submit">

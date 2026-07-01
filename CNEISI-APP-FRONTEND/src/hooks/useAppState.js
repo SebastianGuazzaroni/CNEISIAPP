@@ -41,11 +41,10 @@ export function useAppState() {
 
   const participants = useMemo(
     () =>
-      users.map((user, index) => ({
+      users.map((user) => ({
         id: user.id,
         nombreApellido: user.nombreApellido,
         email: user.email,
-        legajo: user.legajo || String(14000 + index * 243),
       })),
     [users],
   )
@@ -96,6 +95,7 @@ export function useAppState() {
 
     if (!email || !password) {
       setLoginError(true)
+    
       return
     }
 
@@ -295,7 +295,6 @@ export function useAppState() {
           nombreApellido: form.nombreApellido,
           email: form.email.trim().toLowerCase(),
           password: form.password,
-          legajo: form.legajo.trim(),
           rol: 'participant',
         }),
       })
