@@ -1,6 +1,9 @@
 const express = require('express');
-const { body, param, validationResult } = require('express-validator');
+const { body, param } = require('express-validator');
 const { Evento } = require('../models');
+const { auth } = require('../middleware/auth');
+const { requireRole } = require('../middleware/requireRole');
+const { handleValidation } = require('../middleware/validate');
 
 const router = express.Router();
 
@@ -25,15 +28,7 @@ const eventoUpdateValidators = [
   body('descripcion').optional({ nullable: true }).trim(),
 ];
 
-function handleValidation(req, res, next) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-}
-
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const eventos = await Evento.findAll();
     res.json(eventos);
@@ -43,7 +38,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', param('id').isInt().withMessage('El id debe ser un número.'), handleValidation, async (req, res) => {
   try {
     const evento = await Evento.findByPk(req.params.id);
 
@@ -58,9 +53,13 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', eventoCreateValidators, handleValidation, async (req, res) => {
+router.post('/', auth, requireRole('superadmin'), eventoCreateValidators, handleValidation, async (req, res) => {
   try {
-    const evento = await Evento.create(req.body);
+    const payload = {
+      ...req.body,
+      cupoDisponible: req.body.cupoDisponible ?? req.body.cupoMaximo,
+    };
+    const evento = await Evento.create(payload);
     res.status(201).json(evento);
   } catch (error) {
     console.error('POST /Eventos error:', error);
@@ -68,7 +67,7 @@ router.post('/', eventoCreateValidators, handleValidation, async (req, res) => {
   }
 });
 
-router.put('/:id', eventoUpdateValidators, handleValidation, async (req, res) => {
+router.put('/:id', auth, requireRole('superadmin'), eventoUpdateValidators, handleValidation, async (req, res) => {
   try {
     const [updatedCount] = await Evento.update(req.body, { where: { id: req.params.id } });
     if (!updatedCount) {
@@ -82,7 +81,7 @@ router.put('/:id', eventoUpdateValidators, handleValidation, async (req, res) =>
   }
 });
 
-router.delete('/:id', param('id').isInt().withMessage('El id debe ser un número.'), handleValidation, async (req, res) => {
+router.delete('/:id', auth, requireRole('superadmin'), param('id').isInt().withMessage('El id debe ser un número.'), handleValidation, async (req, res) => {
   try {
     const deleted = await Evento.destroy({ where: { id: req.params.id } });
     if (!deleted) {

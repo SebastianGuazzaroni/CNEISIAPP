@@ -1,24 +1,19 @@
 const express = require('express');
-const { body, param, validationResult } = require('express-validator');
-const { Usuario } = require('../models');
+const { body, param } = require('express-validator');
+const { Op } = require('sequelize');
+const { Usuario, Whitelist } = require('../models');
+const { auth } = require('../middleware/auth');
+const { requireRole } = require('../middleware/requireRole');
+const { handleValidation } = require('../middleware/validate');
+const { normalizeRole } = require('../utils/auth');
 
 const router = express.Router();
-
-function normalizeLegajo(value) {
-  if (value === undefined || value === null) return undefined;
-  const normalized = String(value).trim();
-  return normalized === '' ? null : normalized;
-}
 
 const usuarioCreateValidators = [
   body('nombreApellido').trim().notEmpty().withMessage('El nombre es requerido.'),
   body('email').trim().isEmail().withMessage('Email inválido.'),
   body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres.'),
-  body('legajo').optional({ nullable: true }).trim().custom((value) => {
-    if (value === undefined || value === null || value === '') return true;
-    if (/^\d+$/.test(value)) return true;
-    throw new Error('El legajo debe contener sólo números.');
-  }),
+  body('rol').optional().isIn(['participant', 'admin', 'superadmin']).withMessage('Rol inválido.'),
 ];
 
 const usuarioUpdateValidators = [
@@ -26,22 +21,51 @@ const usuarioUpdateValidators = [
   body('nombreApellido').optional().trim().notEmpty().withMessage('El nombre no puede estar vacío.'),
   body('email').optional().trim().isEmail().withMessage('Email inválido.'),
   body('password').optional().isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres.'),
-  body('legajo').optional({ nullable: true }).trim().custom((value) => {
-    if (value === undefined || value === null || value === '') return true;
-    if (/^\d+$/.test(value)) return true;
-    throw new Error('El legajo debe contener sólo números.');
-  }),
+  body('rol').optional().isIn(['participant', 'admin', 'superadmin']).withMessage('Rol inválido.'),
 ];
 
-function handleValidation(req, res, next) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-}
+router.post('/', usuarioCreateValidators, handleValidation, async (req, res) => {
+  try {
+    const { nombreApellido, email, password, rol } = req.body;
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const normalizedName = String(nombreApellido).trim();
+    const requestedRole = normalizeRole(rol || 'participant');
 
-router.get('/', async (req, res) => {
+    if (requestedRole === 'admin') {
+      return res.status(403).json({ message: 'No se puede registrar un administrador públicamente.' });
+    }
+
+    if (requestedRole === 'superadmin') {
+      return res.status(403).json({ message: 'No se puede registrar un superadministrador.' });
+    }
+
+    const whitelisted = await Whitelist.findOne({ where: { email: normalizedEmail } });
+    if (!whitelisted) {
+      return res.status(403).json({ message: 'Email no autorizado. Debe estar en la lista blanca.' });
+    }
+
+    const existing = await Usuario.findOne({ where: { email: normalizedEmail } });
+    if (existing) {
+      return res.status(409).json({ message: 'Email ya registrado.' });
+    }
+
+    const usuario = await Usuario.create({
+      nombreApellido: normalizedName,
+      email: normalizedEmail,
+      password,
+      rol: 'participant',
+    });
+
+    const data = usuario.toJSON();
+    delete data.password;
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('POST /Usuarios error:', error);
+    res.status(500).json({ message: 'Error al crear usuario.' });
+  }
+});
+
+router.get('/', auth, requireRole('superadmin'), async (_req, res) => {
   try {
     const usuarios = await Usuario.findAll({ attributes: { exclude: ['password'] } });
     res.json(usuarios);
@@ -51,10 +75,10 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, requireRole('superadmin'), param('id').isInt().withMessage('El id debe ser un número.'), handleValidation, async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id, {
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password'] },
     });
 
     if (!usuario) {
@@ -68,19 +92,13 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', usuarioCreateValidators, handleValidation, async (req, res) => {
+router.post('/admin', auth, requireRole('superadmin'), usuarioCreateValidators, handleValidation, async (req, res) => {
   try {
-    const { nombreApellido, email, password, legajo, rol } = req.body;
+    const { nombreApellido, email, password } = req.body;
     const normalizedEmail = String(email).trim().toLowerCase();
     const normalizedName = String(nombreApellido).trim();
-    const normalizedLegajo = normalizeLegajo(legajo);
 
-    const existing = await Usuario.findOne({
-      where: {
-        email: normalizedEmail,
-      },
-    });
-
+    const existing = await Usuario.findOne({ where: { email: normalizedEmail } });
     if (existing) {
       return res.status(409).json({ message: 'Email ya registrado.' });
     }
@@ -89,48 +107,42 @@ router.post('/', usuarioCreateValidators, handleValidation, async (req, res) => 
       nombreApellido: normalizedName,
       email: normalizedEmail,
       password,
-      legajo: normalizedLegajo,
-      rol: rol || 'participant',
+      rol: 'admin',
     });
 
     const data = usuario.toJSON();
     delete data.password;
-
     res.status(201).json(data);
   } catch (error) {
-    console.error('POST /Usuarios error:', error);
-    res.status(500).json({ message: 'Error al crear usuario.' });
+    console.error('POST /Usuarios/admin error:', error);
+    res.status(500).json({ message: 'Error al crear administrador.' });
   }
 });
 
-router.put('/:id', usuarioUpdateValidators, handleValidation, async (req, res) => {
+router.put('/:id', auth, requireRole('superadmin'), usuarioUpdateValidators, handleValidation, async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id);
     if (!usuario) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    const { nombreApellido, email, password, legajo, rol } = req.body;
+    const { nombreApellido, email, password, rol } = req.body;
     const updateData = {};
 
     if (nombreApellido !== undefined) updateData.nombreApellido = String(nombreApellido).trim();
     if (email !== undefined) updateData.email = String(email).trim().toLowerCase();
     if (password !== undefined) updateData.password = password;
-    if (legajo !== undefined) updateData.legajo = normalizeLegajo(legajo);
-    if (rol !== undefined) updateData.rol = rol;
+    if (rol !== undefined) updateData.rol = normalizeRole(rol);
 
-    if (updateData.email || updateData.legajo) {
+    if (updateData.email) {
       const existing = await Usuario.findOne({
         where: {
-          id: { [require('sequelize').Op.ne]: req.params.id },
-          [require('sequelize').Op.or]: [
-            ...(updateData.email ? [{ email: updateData.email }] : []),
-            ...(updateData.legajo ? [{ legajo: updateData.legajo }] : []),
-          ],
+          id: { [Op.ne]: req.params.id },
+          email: updateData.email,
         },
       });
       if (existing) {
-        return res.status(409).json({ message: 'Email o legajo ya registrado.' });
+        return res.status(409).json({ message: 'Email ya registrado.' });
       }
     }
 
@@ -138,7 +150,6 @@ router.put('/:id', usuarioUpdateValidators, handleValidation, async (req, res) =
 
     const data = usuario.toJSON();
     delete data.password;
-
     res.json(data);
   } catch (error) {
     console.error('PUT /Usuarios/:id error:', error);
@@ -146,12 +157,18 @@ router.put('/:id', usuarioUpdateValidators, handleValidation, async (req, res) =
   }
 });
 
-router.delete('/:id', param('id').isInt().withMessage('El id debe ser un número.'), handleValidation, async (req, res) => {
+router.delete('/:id', auth, requireRole('superadmin'), param('id').isInt().withMessage('El id debe ser un número.'), handleValidation, async (req, res) => {
   try {
-    const deleted = await Usuario.destroy({ where: { id: req.params.id } });
-    if (!deleted) {
+    const usuario = await Usuario.findByPk(req.params.id);
+    if (!usuario) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
+
+    if (normalizeRole(usuario.rol) === 'superadmin') {
+      return res.status(403).json({ message: 'No se puede eliminar un superadministrador.' });
+    }
+
+    await Usuario.destroy({ where: { id: req.params.id } });
     res.status(204).end();
   } catch (error) {
     console.error('DELETE /Usuarios/:id error:', error);

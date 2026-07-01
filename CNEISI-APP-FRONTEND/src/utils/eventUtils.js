@@ -12,7 +12,6 @@ export const emptyTalkForm = {
 export const emptyAdminForm = {
   nombreApellido: '',
   email: '',
-  legajo: '',
 }
 
 export function normalizeEvent(event) {

@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function EventCard({ event, mode, onAction }) {
   const isEnroll = mode === 'enroll'
   const isCancel = mode === 'cancel'

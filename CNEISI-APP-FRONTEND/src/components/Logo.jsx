@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function Logo({ large = false }) {
   return (
     <div className={large ? 'logo logo-large' : 'logo'} aria-label="CNEISI 2026">

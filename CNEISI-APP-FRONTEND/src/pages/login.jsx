@@ -1,47 +1,62 @@
-import React from 'react'
-import StatusBar from '../components/StatusBar'
-import Logo from '../components/Logo'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Logo from '../components/Logo';
+import { getHomeRoute } from '../utils/routes';
+import { useAuth } from '../hooks/useAuth';
 
-export default function LoginPage({ loginData, loginError, onChange, onGoogle, onSubmit, onBack }) {
+export default function LoginPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError('');
+
+    try {
+      const user = await login(form.email, form.password);
+      navigate(getHomeRoute(user.rol));
+    } catch (err) {
+      const message = err.message || 'Credenciales inválidas';
+      if (message.includes('no autorizado')) {
+        navigate('/unauthorized');
+        return;
+      }
+      setError(message);
+    }
+  }
+
   return (
-    <main className="login-screen">
-      <StatusBar />
+    <main className="auth-screen">
       <Logo large />
-      <form className="login-form" onSubmit={onSubmit}>
+      <form className="auth-card glass-card login-form" onSubmit={handleSubmit}>
+        <h1>Iniciar sesión</h1>
         <input
           aria-label="Email"
-          className={loginError ? 'input-error' : ''}
+          className={error ? 'input-error' : ''}
           placeholder="Email"
           type="email"
-          value={loginData.email}
-          onChange={(event) => onChange({ ...loginData, email: event.target.value })}
+          value={form.email}
+          onChange={(event) => setForm({ ...form, email: event.target.value })}
+          required
         />
         <input
           aria-label="Contraseña"
           placeholder="Contraseña"
           type="password"
-          value={loginData.password}
-          onChange={(event) => onChange({ ...loginData, password: event.target.value })}
+          value={form.password}
+          onChange={(event) => setForm({ ...form, password: event.target.value })}
+          required
         />
-        {loginError ? <span className="login-error">El correo ingresado no corresponde a un inscripto.</span> : null}
-        <button className="forgot-button" type="button">
-          ¿Olvidó su contraseña?
+        {error ? <span className="form-error">{error}</span> : null}
+        <button className="primary-button" type="submit">
+          Iniciar sesión
         </button>
-        <div className="login-actions">
-          <button className="primary-button" type="submit">
-            Iniciar sesión
-          </button>
-          <button aria-label="Iniciar con Google" className="google-button" type="button" onClick={onGoogle}>
-            G
-          </button>
-        </div>
-        <button className="forgot-button" type="button" onClick={onBack}>
+        <Link to="/welcome" className="text-link">
           Volver
-        </button>
+        </Link>
       </form>
-      <div className="brand-placeholder" aria-label="Logo placeholder">
-        {/* Aquí se puede insertar el SVG de la universidad */}
-      </div>
     </main>
-  )
+  );
 }

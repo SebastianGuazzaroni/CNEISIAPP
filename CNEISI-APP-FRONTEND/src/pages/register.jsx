@@ -1,90 +1,87 @@
-import React, { useState } from 'react'
-import StatusBar from '../components/StatusBar'
-import Logo from '../components/Logo'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Logo from '../components/Logo';
+import { useAuth } from '../hooks/useAuth';
 
-
-export default function RegisterPage({ onBack, onSubmit, onSuccess, onGoogle }) {
-  const [form, setForm] = useState({ nombreApellido: '', email: '', password: ''})
-  const [error, setError] = useState('')
+export default function RegisterPage() {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+  const [form, setForm] = useState({ nombreApellido: '', email: '', password: '' });
+  const [error, setError] = useState('');
 
   function handleChange(field, value) {
-    setForm((current) => ({ ...current, [field]: value }))
+    setForm((current) => ({ ...current, [field]: value }));
   }
 
   async function handleSubmit(event) {
-    event.preventDefault()
+    event.preventDefault();
+    setError('');
 
-    const nombreApellido = form.nombreApellido.trim()
-    const email = form.email.trim()
-    const password = form.password
-
-    
+    const nombreApellido = form.nombreApellido.trim();
+    const email = form.email.trim();
+    const { password } = form;
 
     if (!nombreApellido || !email || !password) {
-      setError('Completa todos los campos para registrarte')
-      return
+      setError('Completa todos los campos para registrarte');
+      return;
     }
 
     if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setError('Ingresa un email válido')
-      return
+      setError('Ingresa un email válido');
+      return;
     }
 
     if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres')
-      return
+      setError('La contraseña debe tener al menos 6 caracteres');
+      return;
     }
 
     try {
-      const result = await onSubmit(form)
-      if (!result || !result.success) {
-        setError(result?.message || 'No se pudo registrar usuario')
-      } else {
-        setError('')
-        if (typeof onSuccess === 'function') {
-          onSuccess()
-        }
+      await register(form);
+      navigate('/login');
+    } catch (err) {
+      const message = err.message || 'No se pudo registrar usuario';
+      if (message.includes('lista blanca') || message.includes('no autorizado')) {
+        navigate('/unauthorized');
+        return;
       }
-    } catch (error) {
-      setError(error?.message || 'No se pudo completar el registro')
+      setError(message);
     }
   }
 
   return (
-    <main className="login-screen">
-      <StatusBar />
+    <main className="auth-screen">
       <Logo large />
-      <form className="login-form" onSubmit={handleSubmit}>
+      <form className="auth-card glass-card login-form" onSubmit={handleSubmit}>
         <h1>Registrarse</h1>
         <input
           placeholder="Nombre completo"
           value={form.nombreApellido}
           onChange={(event) => handleChange('nombreApellido', event.target.value)}
+          required
         />
         <input
           placeholder="Email"
           type="email"
           value={form.email}
           onChange={(event) => handleChange('email', event.target.value)}
+          required
         />
         <input
           placeholder="Contraseña"
           type="password"
           value={form.password}
           onChange={(event) => handleChange('password', event.target.value)}
+          required
         />
-        {error ? <span className="login-error">{error}</span> : null}
+        {error ? <span className="form-error">{error}</span> : null}
         <button className="primary-button" type="submit">
           Crear cuenta
         </button>
-        <button className="google-button" type="button" onClick={onGoogle}>
-          G
-        </button>
-        <button className="forgot-button" type="button" onClick={onBack}>
+        <Link to="/welcome" className="text-link">
           Volver
-        </button>
+        </Link>
       </form>
-      <div className="brand-placeholder" aria-label="Logo placeholder" />
     </main>
-  )
+  );
 }

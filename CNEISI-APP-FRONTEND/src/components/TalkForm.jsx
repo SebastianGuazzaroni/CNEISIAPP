@@ -1,4 +1,3 @@
-import React from 'react'
 import SectionTitle from './SectionTitle'
 
 export default function TalkForm({ editing, form, onChange, onDelete, onSubmit }) {

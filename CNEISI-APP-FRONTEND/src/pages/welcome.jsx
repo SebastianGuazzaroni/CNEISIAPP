@@ -1,24 +1,22 @@
-import React from 'react'
-import StatusBar from '../components/StatusBar'
-import Logo from '../components/Logo'
+import { Link } from 'react-router-dom';
+import Logo from '../components/Logo';
 
-export default function WelcomePage({ onLogin, onRegister }) {
+export default function WelcomePage() {
   return (
-    <main className="login-screen">
-      <StatusBar />
+    <main className="auth-screen">
       <Logo large />
-      <div className="welcome-card">
-        <h1>Bienvenido</h1>
+      <div className="auth-card glass-card welcome-card">
+        <h1>Bienvenido a CNEISI</h1>
+        <p>Gestioná tu participación en el congreso</p>
         <div className="welcome-actions">
-          <button className="primary-button wide-save" type="button" onClick={onLogin}>
+          <Link to="/login" className="primary-button wide-save">
             Ingresar
-          </button>
-          <button className="primary-button wide-save" type="button" onClick={onRegister}>
+          </Link>
+          <Link to="/register" className="secondary-button wide-save">
             Registrarse
-          </button>
+          </Link>
         </div>
       </div>
-      <div className="brand-placeholder" aria-label="Logo placeholder" />
     </main>
-  )
+  );
 }
