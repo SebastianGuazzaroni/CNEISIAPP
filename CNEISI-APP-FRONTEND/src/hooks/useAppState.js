@@ -100,11 +100,19 @@ export function useAppState() {
     }
 
     try {
-      const user = await fetchJson('/Authentications', {
+      const response = await fetchJson('/Authentications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
+
+      // La respuesta ahora es { token, user }
+      const user = response.user ?? response
+      const token = response.token ?? null
+
+      if (token) {
+        sessionStorage.setItem('cneisi_token', token)
+      }
 
       setLoginError(false)
       const normalizedRole = normalizeRole(user.rol)
@@ -275,6 +283,7 @@ export function useAppState() {
   }
 
   function logout() {
+    sessionStorage.removeItem('cneisi_token')
     setRole(null)
     setCurrentUser(null)
     setAdminScreen('talks')

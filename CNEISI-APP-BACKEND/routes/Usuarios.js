@@ -1,5 +1,6 @@
 const express = require('express');
 const { body, param, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 const { Usuario } = require('../models');
 
 const router = express.Router();
@@ -74,10 +75,12 @@ router.post('/', usuarioCreateValidators, handleValidation, async (req, res) => 
       return res.status(409).json({ message: 'Email o legajo ya registrado.' });
     }
 
+    const hashedPassword = await bcrypt.hash(String(password), 10);
+
     const usuario = await Usuario.create({
       nombreApellido: normalizedName,
       email: normalizedEmail,
-      password,
+      password: hashedPassword,
       legajo: normalizedLegajo,
       rol: rol || 'participant',
     });
@@ -104,7 +107,7 @@ router.put('/:id', usuarioUpdateValidators, handleValidation, async (req, res) =
 
     if (nombreApellido !== undefined) updateData.nombreApellido = String(nombreApellido).trim();
     if (email !== undefined) updateData.email = String(email).trim().toLowerCase();
-    if (password !== undefined) updateData.password = password;
+    if (password !== undefined) updateData.password = await bcrypt.hash(String(password), 10);
     if (legajo !== undefined) updateData.legajo = String(legajo).trim();
     if (rol !== undefined) updateData.rol = rol;
 

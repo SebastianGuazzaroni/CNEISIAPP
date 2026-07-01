@@ -1,4 +1,5 @@
 import React from 'react'
+import { Table, Form, InputGroup, Button, Badge } from 'react-bootstrap'
 import SectionTitle from './SectionTitle'
 
 export default function ParticipantsTable({ actions, rows, search, title, onChangeSearch, onRowClick }) {
@@ -11,53 +12,48 @@ export default function ParticipantsTable({ actions, rows, search, title, onChan
   return (
     <div className="table-view">
       <SectionTitle>{title}</SectionTitle>
-      <div className="table-shell">
-        <div className="table-toolbar">
-          <button className="icon-button table-tool" type="button" aria-label="Filtrar">
-            ▼
-          </button>
-          <label className="search-box">
-            <span>⌕</span>
-            <input placeholder="Search..." value={search} onChange={(event) => onChangeSearch(event.target.value)} />
-          </label>
-          <div className="table-actions">
-            {actions}
-            <button className="icon-button action-icon" type="button" aria-label="Descargar">
-              ↓
-            </button>
-          </div>
+      <div className="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+        <InputGroup size="sm" style={{ maxWidth: 240 }}>
+          <InputGroup.Text>⌕</InputGroup.Text>
+          <Form.Control
+            placeholder="Buscar..."
+            value={search}
+            onChange={(e) => onChangeSearch(e.target.value)}
+          />
+        </InputGroup>
+        <div className="d-flex gap-1">
+          {actions}
+          <Button size="sm" variant="outline-secondary" aria-label="Descargar">↓</Button>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>
-                <input type="checkbox" aria-label="Seleccionar todos" />
-              </th>
-              <th># ↕</th>
-              <th>NOMBRE ↕</th>
-              <th>EMAIL</th>
-              <th>LEGAJO</th>
+      </div>
+      <Table hover responsive size="sm" className="align-middle" style={{ fontSize: '0.82rem' }}>
+        <thead className="table-light">
+          <tr>
+            <th><Form.Check type="checkbox" aria-label="Seleccionar todos" /></th>
+            <th>#</th>
+            <th>NOMBRE</th>
+            <th>EMAIL</th>
+            <th>LEGAJO</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredRows.slice(0, 8).map((row, index) => (
+            <tr
+              key={row.id}
+              style={{ cursor: onRowClick ? 'pointer' : 'default' }}
+              onClick={() => onRowClick?.(row)}
+            >
+              <td><Form.Check type="checkbox" aria-label={`Seleccionar ${row.nombreApellido}`} /></td>
+              <td>{index + 1}</td>
+              <td className="fw-semibold">{row.nombreApellido}</td>
+              <td className="text-muted">{row.email}</td>
+              <td><Badge bg="light" text="dark">{row.legajo}</Badge></td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredRows.slice(0, 8).map((row, index) => (
-              <tr key={row.id} onClick={() => onRowClick?.(row)}>
-                <td>
-                  <input type="checkbox" aria-label={`Seleccionar ${row.nombreApellido}`} />
-                </td>
-                <td>{index + 1}</td>
-                <td>{row.nombreApellido}</td>
-                <td>{row.email}</td>
-                <td>{row.legajo}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="pagination">
-          <span>1-10 of 97</span>
-          <span>Rows per page: 10⌄</span>
-          <span>‹ 1/10 ›</span>
-        </div>
+          ))}
+        </tbody>
+      </Table>
+      <div className="text-muted text-end" style={{ fontSize: '0.78rem' }}>
+        Mostrando {Math.min(filteredRows.length, 8)} de {filteredRows.length} resultados
       </div>
     </div>
   )

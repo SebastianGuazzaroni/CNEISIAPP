@@ -1,12 +1,27 @@
 import React from 'react'
 import SideNav from './SideNav'
 import EventCards from './EventCards'
+import { useApp } from '../context/AppContext'
 
-export default function ParticipantApp({ events, inscriptions, onCancel, onChangeScreen, onEnroll, screen }) {
+export default function ParticipantApp() {
+  const { events, inscriptions, setConfirm, cancelInscription, enrollTalk, onChangeScreen, participantScreen } = useApp()
+
+  const onCancel = (talk) =>
+    setConfirm({
+      title: `¿Desea cancelar la inscripcion a ${talk.titulo}?`,
+      action: () => cancelInscription(talk),
+    })
+
+  const onEnroll = (talk) =>
+    setConfirm({
+      title: `¿Desea inscribirse a ${talk.titulo}?`,
+      action: () => enrollTalk(talk),
+    })
+
   return (
     <div className="app-layout">
       <SideNav
-        active={screen}
+        active={participantScreen}
         items={[
           { id: 'schedule', label: 'Cronograma' },
           { id: 'enroll', label: 'Inscripciones' },
@@ -16,13 +31,13 @@ export default function ParticipantApp({ events, inscriptions, onCancel, onChang
       />
 
       <section className="content-area">
-        {screen === 'schedule' ? (
+        {participantScreen === 'schedule' ? (
           <EventCards title="CRONOGRAMA" events={events} mode="schedule" />
         ) : null}
-        {screen === 'enroll' ? (
+        {participantScreen === 'enroll' ? (
           <EventCards title="INSCRIPCIÓN A CHARLAS" events={events} mode="enroll" onAction={onEnroll} />
         ) : null}
-        {screen === 'mine' ? (
+        {participantScreen === 'mine' ? (
           <EventCards title="MIS INSCRIPCIONES" events={inscriptions} mode="cancel" onAction={onCancel} />
         ) : null}
       </section>

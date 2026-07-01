@@ -6,30 +6,33 @@ import AdminForm from './AdminForm'
 import TalksAdmin from './TalksAdmin'
 import TalkForm from './TalkForm'
 import MetricsPanel from './MetricsPanel'
+import { useApp } from '../context/AppContext'
 
-export default function AdminApp(props) {
+export default function AdminApp() {
   const {
+    role,
     adminForm,
     adminScreen,
     editingAdmin,
     events,
-    onAddAdmin,
-    onAddTalk,
-    onChangeAdminForm,
+    openAddAdmin,
+    openAddTalk,
+    setAdminForm,
     onChangeScreen,
-    onChangeSearch,
-    onChangeTalkForm,
-    onDeleteAdmin,
-    onDeleteTalk,
-    onEditAdmin,
-    onEditTalk,
-    onSaveAdmin,
-    onSaveTalk,
+    setSearch,
+    setTalkForm,
+    openEditAdmin,
+    openEditTalk,
+    saveAdmin,
+    saveTalk,
     participants,
     search,
     talkForm,
-    isSuperadmin,
-  } = props
+    setConfirm,
+    deleteTalk,
+  } = useApp()
+
+  const isSuperadmin = role === 'superadmin'
 
   const navItems = isSuperadmin
     ? [
@@ -39,6 +42,21 @@ export default function AdminApp(props) {
         { id: 'metrics', label: 'Métricas' },
       ]
     : [{ id: 'talks', label: 'ABM charlas' }]
+
+  const onDeleteAdmin = () =>
+    setConfirm({
+      title: '¿Desea eliminar este perfil?',
+      action: () => {
+        setConfirm(null)
+        setConfirm({ title: '', action: null })
+      },
+    })
+
+  const onDeleteTalk = () =>
+    setConfirm({
+      title: '¿Desea eliminar esta charla?',
+      action: deleteTalk,
+    })
 
   return (
     <div className="app-layout">
@@ -53,20 +71,20 @@ export default function AdminApp(props) {
             rows={participants}
             search={search}
             title="PARTICIPANTES IMPORTADOS"
-            onChangeSearch={onChangeSearch}
+            onChangeSearch={setSearch}
           />
         ) : null}
         {adminScreen === 'admins' && isSuperadmin ? (
           <ParticipantsTable
             actions={
               <>
-                <button className="icon-button action-icon" type="button" onClick={onAddAdmin} aria-label="Añadir perfil">
+                <button className="icon-button action-icon" type="button" onClick={openAddAdmin} aria-label="Añadir perfil">
                   ♁+
                 </button>
                 <button
                   className="icon-button action-icon"
                   type="button"
-                  onClick={() => onEditAdmin(participants[0])}
+                  onClick={() => openEditAdmin(participants[0])}
                   aria-label="Editar perfil"
                 >
                   ◰
@@ -76,8 +94,8 @@ export default function AdminApp(props) {
             rows={participants}
             search={search}
             title="PERFILES ADMINISTRADORES"
-            onChangeSearch={onChangeSearch}
-            onRowClick={onEditAdmin}
+            onChangeSearch={setSearch}
+            onRowClick={openEditAdmin}
           />
         ) : null}
         {adminScreen === 'admin-add' || adminScreen === 'admin-edit' ? (
@@ -85,24 +103,24 @@ export default function AdminApp(props) {
             <AdminForm
               editing={Boolean(editingAdmin)}
               form={adminForm}
-              onChange={onChangeAdminForm}
+              onChange={setAdminForm}
               onDelete={onDeleteAdmin}
-              onSubmit={onSaveAdmin}
+              onSubmit={saveAdmin}
             />
           ) : (
             <div className="empty-state">Acceso restringido a administradores superiores.</div>
           )
         ) : null}
         {adminScreen === 'talks' ? (
-          <TalksAdmin events={events} onAdd={onAddTalk} onEdit={onEditTalk} />
+          <TalksAdmin events={events} onAdd={openAddTalk} onEdit={openEditTalk} />
         ) : null}
         {adminScreen === 'talk-add' || adminScreen === 'talk-edit' ? (
           <TalkForm
             editing={adminScreen === 'talk-edit'}
             form={talkForm}
-            onChange={onChangeTalkForm}
+            onChange={setTalkForm}
             onDelete={onDeleteTalk}
-            onSubmit={onSaveTalk}
+            onSubmit={saveTalk}
           />
         ) : null}
         {adminScreen === 'metrics' && isSuperadmin ? <MetricsPanel /> : null}

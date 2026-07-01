@@ -1,4 +1,5 @@
 import React from 'react'
+import { Card, Badge, Button } from 'react-bootstrap'
 
 export default function EventCard({ event, mode, onAction }) {
   const isEnroll = mode === 'enroll'
@@ -7,44 +8,56 @@ export default function EventCard({ event, mode, onAction }) {
   const available = event.cupoDisponible > 0
 
   return (
-    <article className="event-card">
-      <header>
-        <h3>{event.titulo}</h3>
-        <span>{event.sala || 'Sala no definida'}</span>
-      </header>
-      <p>{event.descripcion}</p>
-      <dl>
-        <div>
-          <dt>Orador</dt>
-          <dd>{event.orador}</dd>
-        </div>
-        <div>
-          <dt>Horario</dt>
-          <dd>{event.horaInicio} - {event.horaFin}</dd>
-        </div>
-        <div>
-          <dt>Cupo</dt>
-          <dd>{event.cupoDisponible ?? event.cupoMaximo} disponible</dd>
-        </div>
-      </dl>
-      {isEnroll ? (
-        <button
-          className="primary-button"
-          type="button"
-          disabled={!available}
-          onClick={() => onAction && onAction(event)}
-        >
-          {available ? 'Inscribirse' : 'Completo'}
-        </button>
-      ) : null}
-      {isCancel ? (
-        <button className="secondary-button" type="button" onClick={() => onAction && onAction(event)}>
-          Cancelar inscripción
-        </button>
-      ) : null}
-      {isSchedule ? (
-        <span className="badge">{available ? 'Disponible' : 'Sin cupo'}</span>
-      ) : null}
-    </article>
+    <Card className="mb-3 shadow-sm">
+      <Card.Header className="d-flex justify-content-between align-items-center">
+        <Card.Title className="mb-0 fs-6 fw-bold">{event.titulo}</Card.Title>
+        <Badge bg="secondary">{event.sala || 'Sala no definida'}</Badge>
+      </Card.Header>
+      <Card.Body>
+        {event.descripcion && (
+          <Card.Text className="text-muted" style={{ fontSize: '0.85rem' }}>
+            {event.descripcion}
+          </Card.Text>
+        )}
+        <dl className="mb-2" style={{ fontSize: '0.82rem' }}>
+          <div className="d-flex gap-2">
+            <dt className="text-muted fw-normal">Orador:</dt>
+            <dd className="mb-1 fw-semibold">{event.orador}</dd>
+          </div>
+          <div className="d-flex gap-2">
+            <dt className="text-muted fw-normal">Horario:</dt>
+            <dd className="mb-1">{event.horaInicio} - {event.horaFin}</dd>
+          </div>
+          <div className="d-flex gap-2">
+            <dt className="text-muted fw-normal">Cupo:</dt>
+            <dd className="mb-0">
+              <Badge bg={available ? 'success' : 'danger'}>
+                {event.cupoDisponible ?? event.cupoMaximo} disponible{available ? '' : ' — Completo'}
+              </Badge>
+            </dd>
+          </div>
+        </dl>
+        {isEnroll && (
+          <Button
+            size="sm"
+            variant={available ? 'primary' : 'secondary'}
+            disabled={!available}
+            onClick={() => onAction?.(event)}
+          >
+            {available ? 'Inscribirse' : 'Completo'}
+          </Button>
+        )}
+        {isCancel && (
+          <Button size="sm" variant="outline-danger" onClick={() => onAction?.(event)}>
+            Cancelar inscripción
+          </Button>
+        )}
+        {isSchedule && (
+          <Badge bg={available ? 'success' : 'secondary'}>
+            {available ? 'Disponible' : 'Sin cupo'}
+          </Badge>
+        )}
+      </Card.Body>
+    </Card>
   )
 }
