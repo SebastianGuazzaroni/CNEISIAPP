@@ -39,7 +39,7 @@ router.post('/', usuarioCreateValidators, handleValidation, async (req, res) => 
       return res.status(403).json({ message: 'No se puede registrar un superadministrador.' });
     }
 
-    const whitelisted = await Whitelist.findOne({ where: { email: normalizedEmail } });
+    const whitelisted = await Whitelist.findOne({where : { email: normalizedEmail } });
     if (!whitelisted) {
       return res.status(403).json({ message: 'Email no autorizado. Debe estar en la lista blanca.' });
     }
