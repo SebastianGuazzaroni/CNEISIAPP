@@ -8,6 +8,8 @@ const { normalizeRole } = require('../utils/auth');
 
 const router = express.Router();
 
+// Todas las rutas de asistencia requieren autenticación y
+// sólo son accesibles para administradores o superadministradores.
 router.use(auth, requireRole('admin', 'superadmin'));
 
 const manualValidators = [

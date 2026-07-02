@@ -10,7 +10,8 @@ function auth(req, res, next) {
   }
 
   try {
-    // Verifica el JWT y construye el objeto de usuario en la request
+    // Verifica el JWT y construye el objeto de usuario en la request.
+    // Este usuario luego es usado por requireRole y las rutas protegidas.
     const payload = verifyToken(token);
     req.user = {
       id: payload.id,
