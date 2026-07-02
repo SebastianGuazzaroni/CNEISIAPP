@@ -1,6 +1,7 @@
 const { verifyToken, normalizeRole } = require('../utils/auth');
 
 function auth(req, res, next) {
+  // Extrae el token Bearer del header Authorization
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
 
@@ -9,6 +10,7 @@ function auth(req, res, next) {
   }
 
   try {
+    // Verifica el JWT y construye el objeto de usuario en la request
     const payload = verifyToken(token);
     req.user = {
       id: payload.id,
@@ -22,6 +24,7 @@ function auth(req, res, next) {
 }
 
 function optionalAuth(req, _res, next) {
+  // Intenta verificar un token si existe, pero no falla si no hay token.
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
 

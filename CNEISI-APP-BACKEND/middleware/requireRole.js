@@ -8,6 +8,7 @@ function requireRole(...roles) {
       return res.status(401).json({ message: 'No autenticado' });
     }
 
+    // Comprueba que el rol del usuario se encuentre entre los permitidos
     const userRole = normalizeRole(req.user.rol);
     if (!allowed.includes(userRole)) {
       return res.status(403).json({ message: 'Acceso denegado' });
