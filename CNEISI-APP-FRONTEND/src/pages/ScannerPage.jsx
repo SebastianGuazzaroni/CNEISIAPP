@@ -1,17 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import api from '../api/client';
-import AppHeader from '../components/Header';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import PageShell from '../components/ui/PageShell';
 import Toast from '../components/ui/Toast';
-import { useAuth } from '../hooks/useAuth';
-import { normalizeRole } from '../utils/roleUtils';
 
 export default function ScannerPage() {
-  const { user } = useAuth();
-  const isSuperadmin = normalizeRole(user?.rol) === 'superadmin';
-
   const [events, setEvents] = useState([]);
   const [eventoId, setEventoId] = useState('');
   const [email, setEmail] = useState('');
@@ -94,8 +87,7 @@ export default function ScannerPage() {
   }
 
   return (
-    <div className="scanner-layout">
-      <AppHeader />
+    <>
       <PageShell title="Escáner QR" description="Control de asistencia a actividades">
         <div className="scanner-viewfinder glass-card">
           <div className="scanner-frame">
@@ -182,12 +174,6 @@ export default function ScannerPage() {
           <span className="status-pill status-warn">Sin inscripción</span>
           <span className="status-pill status-error">Inválido</span>
         </div>
-
-        {isSuperadmin ? (
-          <Link to="/management" className="secondary-button">
-            Volver al panel
-          </Link>
-        ) : null}
       </PageShell>
 
       <ConfirmDialog
@@ -196,6 +182,6 @@ export default function ScannerPage() {
         onCancel={() => setConfirm(null)}
       />
       <Toast message={toast} />
-    </div>
+    </>
   );
 }

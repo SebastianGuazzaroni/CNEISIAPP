@@ -32,6 +32,15 @@ module.exports = (sequelize) => {
         cupoDisponible: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        tipo: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'GENERAL',
+        },
+        fechaFin: {
+            type: DataTypes.DATE,
+            allowNull: true,
         }
     },
         {

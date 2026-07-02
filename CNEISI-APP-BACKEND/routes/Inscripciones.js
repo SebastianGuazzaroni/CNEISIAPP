@@ -5,6 +5,7 @@ const { auth } = require('../middleware/auth');
 const { requireRole } = require('../middleware/requireRole');
 const { handleValidation } = require('../middleware/validate');
 const { normalizeRole } = require('../utils/auth');
+const { VALID_ESTADOS } = require('../utils/feedback');
 
 const router = express.Router();
 
@@ -12,6 +13,22 @@ const inscripcionCreateValidators = [
   body('eventoId').isInt().withMessage('eventoId es requerido y debe ser un número.'),
   body('estado').optional().trim().notEmpty().withMessage('El estado no puede estar vacío.'),
 ];
+
+const inscripcionUpdateValidators = [
+  param('id').isInt().withMessage('El id debe ser un número.'),
+  body('estado')
+    .trim()
+    .notEmpty()
+    .withMessage('El estado es requerido.')
+    .isIn(VALID_ESTADOS)
+    .withMessage(`El estado debe ser uno de: ${VALID_ESTADOS.join(', ')}.`),
+];
+
+const ACTIVE_ESTADOS = ['confirmada', 'pendiente'];
+
+function isActiveEstado(estado) {
+  return ACTIVE_ESTADOS.includes(estado);
+}
 
 router.use(auth);
 
@@ -88,7 +105,10 @@ router.post('/', requireRole('participant'), inscripcionCreateValidators, handle
     await evento.update({ cupoDisponible: evento.cupoDisponible - 1 });
 
     const created = await Inscripcion.findByPk(inscripcion.id, {
-      include: [{ model: Evento, as: 'evento' }],
+      include: [
+        { model: Evento, as: 'evento' },
+        { model: Usuario, as: 'usuario', attributes: { exclude: ['password'] } },
+      ],
     });
 
     res.status(201).json(created);
@@ -97,6 +117,67 @@ router.post('/', requireRole('participant'), inscripcionCreateValidators, handle
     res.status(500).json({ message: 'Error al crear inscripcion' });
   }
 });
+
+router.put(
+  '/:id',
+  requireRole('admin', 'superadmin'),
+  inscripcionUpdateValidators,
+  handleValidation,
+  async (req, res) => {
+    try {
+      const inscripcion = await Inscripcion.findByPk(req.params.id, {
+        include: [{ model: Evento, as: 'evento' }],
+      });
+
+      if (!inscripcion) {
+        return res.status(404).json({ message: 'Inscripcion no encontrada' });
+      }
+
+      const previousEstado = inscripcion.estado;
+      const nextEstado = req.body.estado;
+
+      if (previousEstado === nextEstado) {
+        const unchanged = await Inscripcion.findByPk(inscripcion.id, {
+          include: [
+            { model: Usuario, as: 'usuario', attributes: { exclude: ['password'] } },
+            { model: Evento, as: 'evento' },
+          ],
+        });
+        return res.json(unchanged);
+      }
+
+      const wasActive = isActiveEstado(previousEstado);
+      const willBeActive = isActiveEstado(nextEstado);
+
+      if (!wasActive && willBeActive) {
+        if (!inscripcion.evento || inscripcion.evento.cupoDisponible <= 0) {
+          return res.status(409).json({ message: 'No hay cupo disponible' });
+        }
+        await inscripcion.evento.update({
+          cupoDisponible: inscripcion.evento.cupoDisponible - 1,
+        });
+      } else if (wasActive && !willBeActive && inscripcion.evento) {
+        await inscripcion.evento.update({
+          cupoDisponible: inscripcion.evento.cupoDisponible + 1,
+        });
+      }
+
+      await inscripcion.update({ estado: nextEstado });
+
+      const updated = await Inscripcion.findByPk(inscripcion.id, {
+        include: [
+          { model: Usuario, as: 'usuario', attributes: { exclude: ['password'] } },
+          { model: Evento, as: 'evento' },
+        ],
+      });
+
+      res.json(updated);
+    } catch (error) {
+      console.error('PUT /Inscripciones/:id error:', error);
+      res.status(500).json({ message: 'Error al actualizar inscripcion' });
+    }
+  },
+);
 
 router.delete('/:id', param('id').isInt().withMessage('El id debe ser un número.'), handleValidation, async (req, res) => {
   try {
@@ -113,11 +194,11 @@ router.delete('/:id', param('id').isInt().withMessage('El id debe ser un número
       return res.status(403).json({ message: 'Acceso denegado' });
     }
 
-    if (role !== 'participant' && role !== 'superadmin') {
+    if (role !== 'participant' && role !== 'admin' && role !== 'superadmin') {
       return res.status(403).json({ message: 'Acceso denegado' });
     }
 
-    if (inscripcion.evento) {
+    if (isActiveEstado(inscripcion.estado) && inscripcion.evento) {
       await inscripcion.evento.update({
         cupoDisponible: inscripcion.evento.cupoDisponible + 1,
       });

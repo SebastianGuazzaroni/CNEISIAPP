@@ -108,10 +108,94 @@
 }
 
 .participant-main,
-.management-main {
+.management-main,
+.admin-main {
   flex: 1;
   padding: 1rem;
   padding-bottom: 5.5rem;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+}
+
+.admin-tab {
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.admin-tab.active {
+  background: rgba(12, 67, 76, 0.45);
+  color: var(--cneisi-cyan);
+}
+
+.admin-footer-link {
+  margin-top: 1rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feedback-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.feedback-scores {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.feedback-score-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.inscription-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.inscription-detail-card {
+  width: min(100%, 520px);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 1.25rem;
+}
+
+.inscription-detail-card dl {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.inscription-detail-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.event-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .app-header {

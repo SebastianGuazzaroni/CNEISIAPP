@@ -15,6 +15,8 @@ const eventoCreateValidators = [
   body('cupoMaximo').isInt({ min: 1 }).withMessage('El cupo máximo debe ser un número mayor a 0.'),
   body('cupoDisponible').optional().isInt({ min: 0 }).withMessage('El cupo disponible debe ser un número mayor o igual a 0.'),
   body('descripcion').optional({ nullable: true }).trim(),
+  body('tipo').optional().isIn(['CHARLA', 'TALLER', 'GENERAL']).withMessage('tipo debe ser CHARLA, TALLER o GENERAL.'),
+  body('fechaFin').optional({ nullable: true }).isISO8601().withMessage('fechaFin debe ser una fecha válida.'),
 ];
 
 const eventoUpdateValidators = [
@@ -26,6 +28,8 @@ const eventoUpdateValidators = [
   body('cupoMaximo').optional().isInt({ min: 1 }).withMessage('El cupo máximo debe ser un número mayor a 0.'),
   body('cupoDisponible').optional().isInt({ min: 0 }).withMessage('El cupo disponible debe ser un número mayor o igual a 0.'),
   body('descripcion').optional({ nullable: true }).trim(),
+  body('tipo').optional().isIn(['CHARLA', 'TALLER', 'GENERAL']).withMessage('tipo debe ser CHARLA, TALLER o GENERAL.'),
+  body('fechaFin').optional({ nullable: true }).isISO8601().withMessage('fechaFin debe ser una fecha válida.'),
 ];
 
 router.get('/', async (_req, res) => {

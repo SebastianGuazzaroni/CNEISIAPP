@@ -23,6 +23,11 @@ export default function TalkForm({ editing, form, onChange, onDelete, onSubmit }
         value={form.horaFin}
         onChange={(event) => onChange({ ...form, horaFin: event.target.value })}
       />
+      <select value={form.tipo} onChange={(event) => onChange({ ...form, tipo: event.target.value })}>
+        <option value="CHARLA">Charla</option>
+        <option value="TALLER">Taller</option>
+        <option value="GENERAL">General</option>
+      </select>
       <select value={form.sala} onChange={(event) => onChange({ ...form, sala: event.target.value })}>
         <option value="">Aula</option>
         <option value="114">114</option>

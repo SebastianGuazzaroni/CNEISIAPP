@@ -16,6 +16,7 @@ const Evento = require('./Evento')(sequelize);
 const Inscripcion = require('./Inscripcion')(sequelize);
 const Whitelist = require('./Whitelist')(sequelize);
 const Asistencia = require('./Asistencia')(sequelize);
+const Feedback = require('./Feedback')(sequelize);
 
 Usuario.hasMany(Inscripcion, { foreignKey: 'usuarioId', as: 'inscripciones' });
 Inscripcion.belongsTo(Usuario, { foreignKey: 'usuarioId', as: 'usuario' });
@@ -29,6 +30,15 @@ Asistencia.belongsTo(Usuario, { foreignKey: 'usuarioId', as: 'usuario' });
 Evento.hasMany(Asistencia, { foreignKey: 'eventoId', as: 'asistencias' });
 Asistencia.belongsTo(Evento, { foreignKey: 'eventoId', as: 'evento' });
 
+Usuario.hasMany(Feedback, { foreignKey: 'usuarioId', as: 'feedbacks' });
+Feedback.belongsTo(Usuario, { foreignKey: 'usuarioId', as: 'usuario' });
+
+Evento.hasMany(Feedback, { foreignKey: 'eventoId', as: 'feedbacks' });
+Feedback.belongsTo(Evento, { foreignKey: 'eventoId', as: 'evento' });
+
+Inscripcion.hasMany(Feedback, { foreignKey: 'inscripcionId', as: 'feedbacks' });
+Feedback.belongsTo(Inscripcion, { foreignKey: 'inscripcionId', as: 'inscripcion' });
+
 module.exports = {
   sequelize,
   Usuario,
@@ -36,4 +46,5 @@ module.exports = {
   Inscripcion,
   Whitelist,
   Asistencia,
+  Feedback,
 };

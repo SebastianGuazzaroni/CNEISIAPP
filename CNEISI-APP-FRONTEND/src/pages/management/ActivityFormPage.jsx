@@ -26,15 +26,19 @@ export default function ActivityFormPage() {
       try {
         const { data } = await api.get(`/Eventos/${id}`);
         const date = new Date(data.fecha);
+        const endDate = data.fechaFin ? new Date(data.fechaFin) : null;
         setForm({
           titulo: data.titulo,
           descripcion: data.descripcion || '',
           orador: data.orador,
           fecha: toDateInput(data.fecha),
           horaInicio: date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false }),
-          horaFin: '',
+          horaFin: endDate
+            ? endDate.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })
+            : '',
           sala: data.sala,
           cupoMaximo: data.cupoMaximo,
+          tipo: data.tipo || 'CHARLA',
         });
       } catch (error) {
         setToast(error.message);

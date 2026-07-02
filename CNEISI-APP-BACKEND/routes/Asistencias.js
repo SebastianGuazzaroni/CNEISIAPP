@@ -1,5 +1,5 @@
 const express = require('express');
-const { body } = require('express-validator');
+const { body, param, query } = require('express-validator');
 const { Asistencia, Evento, Inscripcion, Usuario } = require('../models');
 const { auth } = require('../middleware/auth');
 const { requireRole } = require('../middleware/requireRole');
@@ -8,12 +8,22 @@ const { normalizeRole } = require('../utils/auth');
 
 const router = express.Router();
 
-router.use(auth, requireRole('admin', 'superadmin'));
-
 const manualValidators = [
   body('email').trim().isEmail().withMessage('Email inválido.'),
   body('eventoId').isInt().withMessage('eventoId debe ser un número.'),
   body('confirmar').optional().isBoolean().withMessage('confirmar debe ser booleano.'),
+];
+
+const asistenciaUpdateValidators = [
+  param('id').isInt().withMessage('El id debe ser un número.'),
+  body('fechaRegistro').optional().isISO8601().withMessage('fechaRegistro debe ser una fecha válida.'),
+  body('metodo').optional().trim().notEmpty().withMessage('metodo no puede estar vacío.'),
+  body('inscrito').optional().isBoolean().withMessage('inscrito debe ser booleano.'),
+];
+
+const asistenciaIncludes = [
+  { model: Evento, as: 'evento', attributes: ['id', 'titulo', 'tipo'] },
+  { model: Usuario, as: 'usuario', attributes: ['id', 'nombreApellido', 'email'] },
 ];
 
 async function findParticipantByEmail(email) {
@@ -31,7 +41,100 @@ async function findParticipantByEmail(email) {
   return { usuario };
 }
 
-router.post('/validar', manualValidators, handleValidation, async (req, res) => {
+router.use(auth);
+
+router.get(
+  '/',
+  requireRole('admin', 'superadmin'),
+  query('eventoId').optional().isInt().withMessage('eventoId debe ser un número.'),
+  handleValidation,
+  async (req, res) => {
+    try {
+      const where = {};
+      if (req.query.eventoId) {
+        where.eventoId = req.query.eventoId;
+      }
+
+      const asistencias = await Asistencia.findAll({
+        where,
+        include: asistenciaIncludes,
+        order: [['fechaRegistro', 'DESC']],
+      });
+
+      res.json(asistencias);
+    } catch (error) {
+      console.error('GET /Asistencias error:', error);
+      res.status(500).json({ message: 'Error al obtener asistencias' });
+    }
+  },
+);
+
+router.get(
+  '/:id',
+  requireRole('admin', 'superadmin'),
+  param('id').isInt().withMessage('El id debe ser un número.'),
+  handleValidation,
+  async (req, res) => {
+    try {
+      const asistencia = await Asistencia.findByPk(req.params.id, { include: asistenciaIncludes });
+      if (!asistencia) {
+        return res.status(404).json({ message: 'Asistencia no encontrada' });
+      }
+      res.json(asistencia);
+    } catch (error) {
+      console.error('GET /Asistencias/:id error:', error);
+      res.status(500).json({ message: 'Error al obtener asistencia' });
+    }
+  },
+);
+
+router.put(
+  '/:id',
+  requireRole('admin', 'superadmin'),
+  asistenciaUpdateValidators,
+  handleValidation,
+  async (req, res) => {
+    try {
+      const asistencia = await Asistencia.findByPk(req.params.id);
+      if (!asistencia) {
+        return res.status(404).json({ message: 'Asistencia no encontrada' });
+      }
+
+      const updates = {};
+      if (req.body.fechaRegistro !== undefined) updates.fechaRegistro = req.body.fechaRegistro;
+      if (req.body.metodo !== undefined) updates.metodo = req.body.metodo;
+      if (req.body.inscrito !== undefined) updates.inscrito = req.body.inscrito;
+
+      await asistencia.update(updates);
+      const updated = await Asistencia.findByPk(asistencia.id, { include: asistenciaIncludes });
+      res.json(updated);
+    } catch (error) {
+      console.error('PUT /Asistencias/:id error:', error);
+      res.status(500).json({ message: 'Error al actualizar asistencia' });
+    }
+  },
+);
+
+router.delete(
+  '/:id',
+  requireRole('admin', 'superadmin'),
+  param('id').isInt().withMessage('El id debe ser un número.'),
+  handleValidation,
+  async (req, res) => {
+    try {
+      const deleted = await Asistencia.destroy({ where: { id: req.params.id } });
+      if (!deleted) {
+        return res.status(404).json({ message: 'Asistencia no encontrada' });
+      }
+      res.status(204).end();
+    } catch (error) {
+      console.error('DELETE /Asistencias/:id error:', error);
+      res.status(500).json({ message: 'Error al eliminar asistencia' });
+    }
+  },
+);
+
+router.post('/validar', requireRole('admin', 'superadmin'), manualValidators, handleValidation, async (req, res) => {
   try {
     const { email, eventoId } = req.body;
     const { usuario, error: userError } = await findParticipantByEmail(email);
@@ -77,7 +180,7 @@ router.post('/validar', manualValidators, handleValidation, async (req, res) => 
   }
 });
 
-router.post('/manual', manualValidators, handleValidation, async (req, res) => {
+router.post('/manual', requireRole('admin', 'superadmin'), manualValidators, handleValidation, async (req, res) => {
   try {
     const { email, eventoId, confirmar = false } = req.body;
     const { usuario, error: userError } = await findParticipantByEmail(email);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../api/client';
 import EventCards from '../../components/EventCards';
 import Toast from '../../components/ui/Toast';
@@ -35,7 +36,7 @@ export default function TimelinePage() {
   async function handleEnroll(event) {
     try {
       await api.post('/Inscripciones', { eventoId: event.id });
-      setToast('Inscripción confirmada');
+      setToast('Inscripción confirmada. Ver detalle en Mis Inscripciones.');
       const { events: nextEvents, inscriptions: nextInscriptions } = await fetchTimelineData();
       setEvents(nextEvents);
       setInscriptions(nextInscriptions);
@@ -57,6 +58,9 @@ export default function TimelinePage() {
           onAction={handleEnroll}
         />
       ) : null}
+      <p className="scanner-hint">
+        <Link to="/participant/inscriptions">Ir a Mis Inscripciones</Link>
+      </p>
       <Toast message={toast} />
     </>
   );

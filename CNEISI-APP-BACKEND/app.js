@@ -5,6 +5,7 @@ const EventosRouter = require('./routes/Eventos');
 const InscripcionesRouter = require('./routes/Inscripciones');
 const WhitelistRouter = require('./routes/Whitelist');
 const AsistenciasRouter = require('./routes/Asistencias');
+const FeedbacksRouter = require('./routes/Feedbacks');
 const AuthRouter = require('./routes/Authentications');
 const { sequelize } = require('./models');
 const { Sequelize } = require('sequelize');
@@ -19,6 +20,7 @@ app.use('/api/Eventos', EventosRouter);
 app.use('/api/Inscripciones', InscripcionesRouter);
 app.use('/api/Whitelist', WhitelistRouter);
 app.use('/api/Asistencias', AsistenciasRouter);
+app.use('/api/Feedbacks', FeedbacksRouter);
 app.use('/api/Authentications', AuthRouter);
 
 const startServer = async () => {
@@ -38,6 +40,28 @@ const startServer = async () => {
       }
     } catch (err) {
       console.warn('Could not ensure Usuarios.rol column:', err.message || err);
+    }
+
+    try {
+      const qi = sequelize.getQueryInterface();
+      const eventoInfo = await qi.describeTable('Eventos');
+      if (!eventoInfo.tipo) {
+        await qi.addColumn('Eventos', 'tipo', {
+          type: Sequelize.STRING,
+          allowNull: false,
+          defaultValue: 'GENERAL',
+        });
+        console.log('Added column Eventos.tipo');
+      }
+      if (!eventoInfo.fechaFin) {
+        await qi.addColumn('Eventos', 'fechaFin', {
+          type: Sequelize.DATE,
+          allowNull: true,
+        });
+        console.log('Added column Eventos.fechaFin');
+      }
+    } catch (err) {
+      console.warn('Could not ensure Eventos columns:', err.message || err);
     }
 
     app.listen(PORT, () => {

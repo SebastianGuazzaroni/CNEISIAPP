@@ -1,7 +1,8 @@
-export default function EventCard({ event, mode, onAction }) {
+export default function EventCard({ event, mode, onAction, onDetail }) {
   const isEnroll = mode === 'enroll'
   const isCancel = mode === 'cancel'
   const isSchedule = mode === 'schedule'
+  const isInscription = mode === 'inscription'
   const available = event.cupoDisponible > 0
 
   return (
@@ -39,6 +40,16 @@ export default function EventCard({ event, mode, onAction }) {
         <button className="secondary-button" type="button" onClick={() => onAction && onAction(event)}>
           Cancelar inscripción
         </button>
+      ) : null}
+      {isInscription ? (
+        <div className="event-card-actions">
+          <button className="primary-button" type="button" onClick={() => onDetail && onDetail(event)}>
+            Ver detalle
+          </button>
+          <button className="secondary-button" type="button" onClick={() => onAction && onAction(event)}>
+            Cancelar inscripción
+          </button>
+        </div>
       ) : null}
       {isSchedule ? (
         <span className="badge">{available ? 'Disponible' : 'Sin cupo'}</span>

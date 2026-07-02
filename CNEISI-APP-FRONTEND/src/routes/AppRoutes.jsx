@@ -9,6 +9,9 @@ import WelcomePage from '../pages/welcome';
 import LoginPage from '../pages/login';
 import RegisterPage from '../pages/register';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
+import AdminAreaLayout from '../components/layout/AdminAreaLayout';
+import AdminInscriptionsPage from '../pages/admin/AdminInscriptionsPage';
+import AdminAttendancesPage from '../pages/admin/AdminAttendancesPage';
 import ScannerPage from '../pages/ScannerPage';
 import HomePage from '../pages/participant/HomePage';
 import TimelinePage from '../pages/participant/TimelinePage';
@@ -53,7 +56,11 @@ export default function AppRoutes() {
         </Route>
 
         <Route element={<ProtectedRoute roles={['admin', 'superadmin']} />}>
-          <Route path="/scanner" element={<ScannerPage />} />
+          <Route element={<AdminAreaLayout />}>
+            <Route path="/scanner" element={<ScannerPage />} />
+            <Route path="/scanner/inscripciones" element={<AdminInscriptionsPage />} />
+            <Route path="/scanner/asistencias" element={<AdminAttendancesPage />} />
+          </Route>
         </Route>
 
         <Route element={<ProtectedRoute roles={['superadmin']} />}>
