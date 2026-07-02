@@ -14,25 +14,25 @@ export default function AdminAreaLayout() {
   const isSuperadmin = normalizeRole(user?.rol) === 'superadmin';
 
   return (
-    <div className="scanner-layout">
+    <div className="min-vh-100 d-flex flex-column">
       <AppHeader />
-      <nav className="admin-tabs glass-panel">
+      <nav className="glass-panel d-flex gap-2 px-3 py-2 overflow-auto">
         {tabs.map((tab) => (
           <NavLink
             key={tab.to}
             to={tab.to}
             end={tab.end}
-            className={({ isActive }) => `admin-tab${isActive ? ' active' : ''}`}
+            className={({ isActive }) => `nav-pill-link ${isActive ? 'active' : ''}`}
           >
             {tab.label}
           </NavLink>
         ))}
       </nav>
-      <main className="admin-main">
+      <main className="flex-grow-1 p-3">
         <Outlet />
         {isSuperadmin ? (
-          <div className="admin-footer-link">
-            <Link to="/management" className="secondary-button">
+          <div className="mt-3">
+            <Link to="/management" className="btn btn-outline-cneisi">
               Volver al panel
             </Link>
           </div>

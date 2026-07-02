@@ -1,9 +1,8 @@
-export default function EmptyState({ message, description, icon }) {
+export default function EmptyState({ message, description }) {
   return (
-    <div className="empty-state-card">
-      {icon ? <div className="empty-state-icon">{icon}</div> : null}
-      <p className="empty-state-message">{message}</p>
-      {description ? <p className="empty-state-description">{description}</p> : null}
+    <div className="text-center text-secondary py-5">
+      <p className="fw-semibold mb-1">{message}</p>
+      {description ? <p className="small mb-0">{description}</p> : null}
     </div>
   );
 }

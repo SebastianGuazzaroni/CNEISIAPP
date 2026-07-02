@@ -8,21 +8,25 @@ export default function HomePage() {
 
   return (
     <PageShell title="Mi perfil" description="Accedé a tu información y código QR del congreso">
-      <div className="profile-card glass-card">
-        <h2>{user?.nombreApellido}</h2>
-        <p>{user?.email}</p>
-        <div className="qr-placeholder">
-          <div className="qr-box">{qrData}</div>
-          <p className="qr-hint">Presentá este código en el acceso a las charlas</p>
+      <div className="glass-card p-4">
+        <h2 className="h4 fw-bold text-warning">{user?.nombreApellido}</h2>
+        <p className="text-secondary">{user?.email}</p>
+        <div className="text-center mt-4">
+          <div className="glass-card p-4 font-monospace">{qrData}</div>
+          <p className="text-secondary small mt-2 mb-0">Presentá este código en el acceso a las charlas</p>
         </div>
       </div>
-      <div className="quick-links">
-        <Link to="/participant/timeline" className="quick-link glass-card">
-          Ver cronograma
-        </Link>
-        <Link to="/participant/inscriptions" className="quick-link glass-card">
-          Mis inscripciones
-        </Link>
+      <div className="row g-3">
+        <div className="col-md-6">
+          <Link to="/participant/timeline" className="glass-card p-4 d-block h-100 fw-semibold">
+            Ver cronograma
+          </Link>
+        </div>
+        <div className="col-md-6">
+          <Link to="/participant/inscriptions" className="glass-card p-4 d-block h-100 fw-semibold">
+            Mis inscripciones
+          </Link>
+        </div>
       </div>
     </PageShell>
   );

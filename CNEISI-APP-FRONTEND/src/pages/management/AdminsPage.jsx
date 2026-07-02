@@ -98,14 +98,14 @@ export default function AdminsPage() {
         title="Administradores"
         description="Gestionar cuentas de coordinadores y voluntarios"
         actions={
-          <button type="button" className="primary-button" onClick={openCreate}>
+          <button type="button" className="btn btn-cneisi" onClick={openCreate}>
             Nuevo administrador
           </button>
         }
       >
-        <div className="table-toolbar">
+        <div className="mb-3">
           <input
-            className="search-input"
+            className="form-control"
             placeholder="Buscar..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -113,15 +113,17 @@ export default function AdminsPage() {
         </div>
 
         {showForm ? (
-          <form className="form-card glass-card" onSubmit={handleSubmit}>
-            <h3>{editingId ? 'Editar administrador' : 'Nuevo administrador'}</h3>
+          <form className="glass-card p-4 d-flex flex-column gap-3 mb-3" onSubmit={handleSubmit}>
+            <h3 className="h5 fw-bold">{editingId ? 'Editar administrador' : 'Nuevo administrador'}</h3>
             <input
+              className="form-control"
               placeholder="Nombre completo"
               value={form.nombreApellido}
               onChange={(event) => setForm({ ...form, nombreApellido: event.target.value })}
               required
             />
             <input
+              className="form-control"
               placeholder="Email"
               type="email"
               value={form.email}
@@ -129,25 +131,26 @@ export default function AdminsPage() {
               required
             />
             <input
+              className="form-control"
               placeholder={editingId ? 'Nueva contraseña (opcional)' : 'Contraseña'}
               type="password"
               value={form.password}
               onChange={(event) => setForm({ ...form, password: event.target.value })}
               required={!editingId}
             />
-            <div className="form-actions">
-              <button type="submit" className="primary-button">
+            <div className="d-flex gap-2">
+              <button type="submit" className="btn btn-success">
                 Guardar
               </button>
-              <button type="button" onClick={() => setShowForm(false)}>
+              <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>
                 Cancelar
               </button>
             </div>
           </form>
         ) : null}
 
-        <div className="data-table glass-card">
-          <table>
+        <div className="glass-card p-0 overflow-auto">
+          <table className="table table-hover mb-0">
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -161,11 +164,11 @@ export default function AdminsPage() {
                   <tr key={admin.id}>
                     <td>{admin.nombreApellido}</td>
                     <td>{admin.email}</td>
-                    <td className="table-actions-cell">
-                      <button type="button" onClick={() => openEdit(admin)}>
+                    <td className="d-flex gap-2">
+                      <button type="button" className="btn btn-sm btn-outline-cneisi" onClick={() => openEdit(admin)}>
                         Editar
                       </button>
-                      <button type="button" className="danger-button" onClick={() => askDelete(admin)}>
+                      <button type="button" className="btn btn-sm btn-danger" onClick={() => askDelete(admin)}>
                         Eliminar
                       </button>
                     </td>
@@ -184,6 +187,7 @@ export default function AdminsPage() {
       </PageShell>
 
       <ConfirmDialog
+        destructive
         title={confirm?.title}
         onConfirm={confirm?.action}
         onCancel={() => setConfirm(null)}

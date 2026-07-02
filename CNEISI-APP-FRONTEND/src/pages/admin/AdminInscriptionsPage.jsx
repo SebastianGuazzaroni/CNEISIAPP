@@ -88,9 +88,9 @@ export default function AdminInscriptionsPage() {
   return (
     <>
       <PageShell title="Inscripciones" description="Listar, editar y eliminar inscripciones">
-        <div className="table-toolbar">
+        <div className="mb-3">
           <input
-            className="search-input"
+            className="form-control"
             placeholder="Buscar por ID, participante o evento..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -98,11 +98,12 @@ export default function AdminInscriptionsPage() {
         </div>
 
         {editing ? (
-          <form className="form-card glass-card" onSubmit={handleSave}>
-            <h3>Editar inscripción #{editing.id}</h3>
-            <label>
+          <form className="glass-card p-4 d-flex flex-column gap-3 mb-3" onSubmit={handleSave}>
+            <h3 className="h5 fw-bold">Editar inscripción #{editing.id}</h3>
+            <label className="d-flex flex-column gap-1 small text-secondary">
               Estado
               <select
+                className="form-select"
                 value={editing.estado}
                 onChange={(event) => setEditing({ ...editing, estado: event.target.value })}
               >
@@ -113,19 +114,19 @@ export default function AdminInscriptionsPage() {
                 ))}
               </select>
             </label>
-            <div className="form-actions">
-              <button type="submit" className="primary-button">
+            <div className="d-flex gap-2">
+              <button type="submit" className="btn btn-success">
                 Guardar
               </button>
-              <button type="button" onClick={() => setEditing(null)}>
+              <button type="button" className="btn btn-secondary" onClick={() => setEditing(null)}>
                 Cancelar
               </button>
             </div>
           </form>
         ) : null}
 
-        <div className="data-table glass-card">
-          <table>
+        <div className="glass-card p-0 overflow-auto">
+          <table className="table table-hover mb-0">
             <thead>
               <tr>
                 <th>ID</th>
@@ -150,11 +151,11 @@ export default function AdminInscriptionsPage() {
                     <td>{item.evento?.tipo || '-'}</td>
                     <td>{item.estado}</td>
                     <td>{formatDate(item.fechaInscripcion)}</td>
-                    <td className="table-actions-cell">
-                      <button type="button" onClick={() => openEdit(item)}>
+                    <td className="d-flex gap-2">
+                      <button type="button" className="btn btn-sm btn-outline-cneisi" onClick={() => openEdit(item)}>
                         Editar
                       </button>
-                      <button type="button" className="danger-button" onClick={() => askDelete(item)}>
+                      <button type="button" className="btn btn-sm btn-danger" onClick={() => askDelete(item)}>
                         Eliminar
                       </button>
                     </td>
@@ -173,6 +174,7 @@ export default function AdminInscriptionsPage() {
       </PageShell>
 
       <ConfirmDialog
+        destructive
         title={confirm?.title}
         onConfirm={confirm?.action}
         onCancel={() => setConfirm(null)}

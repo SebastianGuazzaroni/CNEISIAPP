@@ -105,6 +105,7 @@ export default function InscriptionsPage() {
         onFeedbackError={(message) => setToast(message)}
       />
       <ConfirmDialog
+        destructive
         title={confirm?.title}
         onConfirm={confirm?.action}
         onCancel={() => setConfirm(null)}

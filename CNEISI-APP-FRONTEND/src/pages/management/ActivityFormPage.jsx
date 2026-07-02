@@ -88,7 +88,7 @@ export default function ActivityFormPage() {
         title={isEditing ? 'Editar actividad' : 'Nueva actividad'}
         description="Configurá charlas y talleres del evento"
         actions={
-          <Link to="/management/activities" className="secondary-button">
+          <Link to="/management/activities" className="btn btn-secondary">
             Volver
           </Link>
         }
@@ -102,6 +102,7 @@ export default function ActivityFormPage() {
         />
       </PageShell>
       <ConfirmDialog
+        destructive
         title={confirm?.title}
         onConfirm={confirm?.action}
         onCancel={() => setConfirm(null)}

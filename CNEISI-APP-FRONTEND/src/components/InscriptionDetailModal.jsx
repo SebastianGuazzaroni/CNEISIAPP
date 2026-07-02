@@ -24,52 +24,50 @@ export default function InscriptionDetailModal({
 
   return (
     <div className="inscription-detail-modal" role="dialog" aria-modal="true">
-      <div className="inscription-detail-card glass-card">
-        <h3>Detalle de inscripción</h3>
-        <dl>
-          <div>
-            <dt>ID inscripción</dt>
+      <div className="glass-card p-4 w-100" style={{ maxWidth: '520px', maxHeight: '90vh', overflow: 'auto' }}>
+        <h3 className="h5 fw-bold">Detalle de inscripción</h3>
+        <dl className="row g-2 small my-3">
+          <div className="col-sm-6">
+            <dt className="text-secondary">ID inscripción</dt>
             <dd>{item.id || item.inscriptionId}</dd>
           </div>
-          <div>
-            <dt>Evento</dt>
+          <div className="col-sm-6">
+            <dt className="text-secondary">Evento</dt>
             <dd>{event.titulo}</dd>
           </div>
-          <div>
-            <dt>Tipo</dt>
+          <div className="col-sm-6">
+            <dt className="text-secondary">Tipo</dt>
             <dd>{event.tipo || 'GENERAL'}</dd>
           </div>
-          <div>
-            <dt>Orador</dt>
+          <div className="col-sm-6">
+            <dt className="text-secondary">Orador</dt>
             <dd>{event.orador}</dd>
           </div>
-          <div>
-            <dt>Sala</dt>
+          <div className="col-sm-6">
+            <dt className="text-secondary">Sala</dt>
             <dd>{event.sala}</dd>
           </div>
-          <div>
-            <dt>Horario</dt>
-            <dd>
-              {event.horaInicio} - {event.horaFin}
-            </dd>
+          <div className="col-sm-6">
+            <dt className="text-secondary">Horario</dt>
+            <dd>{event.horaInicio} - {event.horaFin}</dd>
           </div>
-          <div>
-            <dt>Estado</dt>
+          <div className="col-sm-6">
+            <dt className="text-secondary">Estado</dt>
             <dd>{item.estado || 'confirmada'}</dd>
           </div>
-          <div>
-            <dt>Fecha de inscripción</dt>
+          <div className="col-sm-6">
+            <dt className="text-secondary">Fecha de inscripción</dt>
             <dd>{formatDateTime(item.fechaInscripcion)}</dd>
           </div>
         </dl>
 
         {hasFeedback ? (
-          <div className="feedback-scores glass-card">
-            <h4>Tu feedback</h4>
+          <div className="glass-card p-3 mb-3">
+            <h4 className="h6 fw-bold">Tu feedback</h4>
             {FEEDBACK_QUESTIONS.map((question, index) => (
-              <div key={question} className="feedback-score-row">
+              <div key={question} className="d-flex justify-content-between gap-3 py-1 small">
                 <span>{question}</span>
-                <strong>{feedback[`respuesta${index + 1}`]}</strong>
+                <strong className="text-warning">{feedback[`respuesta${index + 1}`]}</strong>
               </div>
             ))}
           </div>
@@ -80,16 +78,14 @@ export default function InscriptionDetailModal({
             onError={onFeedbackError}
           />
         ) : (
-          <p className="scanner-hint">
+          <p className="text-secondary small">
             El feedback estará disponible 15 minutos después de finalizado el evento.
           </p>
         )}
 
-        <div className="inscription-detail-actions">
-          <button type="button" className="secondary-button" onClick={onClose}>
-            Cerrar
-          </button>
-        </div>
+        <button type="button" className="btn btn-secondary mt-3" onClick={onClose}>
+          Cerrar
+        </button>
       </div>
     </div>
   );

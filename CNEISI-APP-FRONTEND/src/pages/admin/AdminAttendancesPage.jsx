@@ -103,10 +103,10 @@ export default function AdminAttendancesPage() {
   return (
     <>
       <PageShell title="Asistencias" description="Ver y gestionar asistencias por evento">
-        <div className="table-toolbar">
-          <label>
+        <div className="mb-3">
+          <label className="d-flex flex-column gap-1 small text-secondary">
             Evento
-            <select value={eventoId} onChange={(event) => setEventoId(event.target.value)}>
+            <select className="form-select" value={eventoId} onChange={(event) => setEventoId(event.target.value)}>
               <option value="">Seleccionar evento</option>
               {events.map((event) => (
                 <option key={event.id} value={event.id}>
@@ -118,46 +118,49 @@ export default function AdminAttendancesPage() {
         </div>
 
         {editing ? (
-          <form className="form-card glass-card" onSubmit={handleSave}>
-            <h3>Editar asistencia #{editing.id}</h3>
-            <label>
+          <form className="glass-card p-4 d-flex flex-column gap-3 mb-3" onSubmit={handleSave}>
+            <h3 className="h5 fw-bold">Editar asistencia #{editing.id}</h3>
+            <label className="d-flex flex-column gap-1 small text-secondary">
               Fecha y hora
               <input
+                className="form-control"
                 type="datetime-local"
                 value={editing.fechaRegistro}
                 onChange={(event) => setEditing({ ...editing, fechaRegistro: event.target.value })}
                 required
               />
             </label>
-            <label>
+            <label className="d-flex flex-column gap-1 small text-secondary">
               Método
               <input
+                className="form-control"
                 value={editing.metodo}
                 onChange={(event) => setEditing({ ...editing, metodo: event.target.value })}
                 required
               />
             </label>
-            <label className="checkbox-label">
+            <label className="form-check">
               <input
+                className="form-check-input"
                 type="checkbox"
                 checked={editing.inscrito}
                 onChange={(event) => setEditing({ ...editing, inscrito: event.target.checked })}
               />
-              Inscripto
+              <span className="form-check-label">Inscripto</span>
             </label>
-            <div className="form-actions">
-              <button type="submit" className="primary-button">
+            <div className="d-flex gap-2">
+              <button type="submit" className="btn btn-success">
                 Guardar
               </button>
-              <button type="button" onClick={() => setEditing(null)}>
+              <button type="button" className="btn btn-secondary" onClick={() => setEditing(null)}>
                 Cancelar
               </button>
             </div>
           </form>
         ) : null}
 
-        <div className="data-table glass-card">
-          <table>
+        <div className="glass-card p-0 overflow-auto">
+          <table className="table table-hover mb-0">
             <thead>
               <tr>
                 <th>ID</th>
@@ -185,11 +188,11 @@ export default function AdminAttendancesPage() {
                     <td>{item.usuario?.nombreApellido || '-'}</td>
                     <td>{item.usuario?.email || '-'}</td>
                     <td>{formatDate(item.fechaRegistro)}</td>
-                    <td className="table-actions-cell">
-                      <button type="button" onClick={() => openEdit(item)}>
+                    <td className="d-flex gap-2">
+                      <button type="button" className="btn btn-sm btn-outline-cneisi" onClick={() => openEdit(item)}>
                         Editar
                       </button>
-                      <button type="button" className="danger-button" onClick={() => askDelete(item)}>
+                      <button type="button" className="btn btn-sm btn-danger" onClick={() => askDelete(item)}>
                         Eliminar
                       </button>
                     </td>
@@ -208,6 +211,7 @@ export default function AdminAttendancesPage() {
       </PageShell>
 
       <ConfirmDialog
+        destructive
         title={confirm?.title}
         onConfirm={confirm?.action}
         onCancel={() => setConfirm(null)}

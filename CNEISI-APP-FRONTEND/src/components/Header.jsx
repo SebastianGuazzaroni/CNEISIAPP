@@ -14,18 +14,22 @@ export default function AppHeader() {
   const role = normalizeRole(user?.rol);
 
   return (
-    <header className="app-header glass-panel">
-      <div className="profile-chip">
+    <header className="app-header glass-panel sticky-top d-grid align-items-center gap-3 px-3 py-2"
+      style={{ gridTemplateColumns: '1fr auto 1fr', zIndex: 30 }}
+    >
+      <div className="d-flex align-items-center gap-3">
         <Avatar participant={role === 'participant'} />
         <div>
-          <strong>{user?.nombreApellido || 'Usuario'}</strong>
-          <span className={`role-badge role-${role}`}>{roleLabels[role]}</span>
+          <strong className="d-block">{user?.nombreApellido || 'Usuario'}</strong>
+          <span className="small text-secondary">{roleLabels[role]}</span>
         </div>
       </div>
       <Logo />
-      <button className="icon-button menu-button" type="button" onClick={logout} aria-label="Salir">
-        Salir
-      </button>
+      <div className="d-flex justify-content-end">
+        <button className="btn btn-danger btn-sm" type="button" onClick={logout} aria-label="Salir">
+          Cerrar sesión
+        </button>
+      </div>
     </header>
   );
 }

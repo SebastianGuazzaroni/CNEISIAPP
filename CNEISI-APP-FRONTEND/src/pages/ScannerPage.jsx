@@ -89,22 +89,22 @@ export default function ScannerPage() {
   return (
     <>
       <PageShell title="Escáner QR" description="Control de asistencia a actividades">
-        <div className="scanner-viewfinder glass-card">
+        <div className="glass-card p-4 p-md-5 text-center">
           <div className="scanner-frame">
             <div className="scanner-corner tl" />
             <div className="scanner-corner tr" />
             <div className="scanner-corner bl" />
             <div className="scanner-corner br" />
           </div>
-          <p className="scanner-status">Escáner con cámara — Próximamente</p>
-          <p className="scanner-hint">Usá el registro manual mientras tanto</p>
+          <p className="fw-semibold mb-1">Escáner con cámara — Próximamente</p>
+          <p className="text-secondary small mb-0">Usá el registro manual mientras tanto</p>
         </div>
 
-        <form className="manual-attendance-form glass-card" onSubmit={handleValidate}>
-          <h3>Registro manual</h3>
-          <label>
+        <form className="glass-card p-4 d-flex flex-column gap-3" onSubmit={handleValidate}>
+          <h3 className="h5 fw-bold mb-0">Registro manual</h3>
+          <label className="d-flex flex-column gap-1 small text-secondary">
             Actividad
-            <select value={eventoId} onChange={(e) => setEventoId(e.target.value)} required>
+            <select className="form-select" value={eventoId} onChange={(e) => setEventoId(e.target.value)} required>
               <option value="">Seleccionar actividad</option>
               {events.map((event) => (
                 <option key={event.id} value={event.id}>
@@ -113,9 +113,10 @@ export default function ScannerPage() {
               ))}
             </select>
           </label>
-          <label>
+          <label className="d-flex flex-column gap-1 small text-secondary">
             Email del participante
             <input
+              className="form-control"
               type="email"
               placeholder="participante@cneisi.test"
               value={email}
@@ -126,13 +127,13 @@ export default function ScannerPage() {
               required
             />
           </label>
-          <div className="form-actions">
-            <button type="submit" className="secondary-button" disabled={loading}>
+          <div className="d-flex gap-2 flex-wrap">
+            <button type="submit" className="btn btn-secondary" disabled={loading}>
               Validar
             </button>
             <button
               type="button"
-              className="primary-button"
+              className="btn btn-success"
               disabled={loading || !eventoId || !email.trim()}
               onClick={handleRegister}
             >
@@ -142,11 +143,11 @@ export default function ScannerPage() {
         </form>
 
         {validation ? (
-          <div className={`validation-result glass-card status-${validation.status}`}>
+          <div className={`glass-card p-4 status-${validation.status}`}>
             {validation.status === 'ok' ? (
               <>
                 <span className="status-pill status-ok">Confirmado</span>
-                <p>
+                <p className="mb-0 mt-2">
                   {validation.usuario?.nombreApellido} — inscripto en {validation.evento?.titulo}
                 </p>
               </>
@@ -154,7 +155,7 @@ export default function ScannerPage() {
             {validation.status === 'warn' ? (
               <>
                 <span className="status-pill status-warn">Sin inscripción</span>
-                <p>
+                <p className="mb-0 mt-2">
                   {validation.usuario?.nombreApellido} no está inscripto en esta actividad.
                   {validation.registered ? ' Asistencia registrada igualmente.' : ' Podés confirmar el registro.'}
                 </p>
@@ -163,13 +164,13 @@ export default function ScannerPage() {
             {validation.status === 'error' ? (
               <>
                 <span className="status-pill status-error">Inválido</span>
-                <p>{validation.message}</p>
+                <p className="mb-0 mt-2">{validation.message}</p>
               </>
             ) : null}
           </div>
         ) : null}
 
-        <div className="scanner-examples">
+        <div className="d-flex gap-2 flex-wrap">
           <span className="status-pill status-ok">Confirmado</span>
           <span className="status-pill status-warn">Sin inscripción</span>
           <span className="status-pill status-error">Inválido</span>

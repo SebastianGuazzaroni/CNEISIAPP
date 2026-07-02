@@ -1,11 +1,24 @@
-export default function Logo({ large = false }) {
+import cneisiLogo from '../style/img/optimized.webp';
+import utnLogo from '../style/img/Logo_Blanco.png';
+
+export default function Logo({ large = false, showUtn = false, centered = false }) {
   return (
-    <div className={large ? 'logo logo-large' : 'logo'} aria-label="CNEISI 2026">
-      <span className="logo-code">&lt;</span>
-      <span>CNEISI</span>
-      <span className="logo-slash">/</span>
-      <span className="logo-code">&gt;</span>
-      <small>2026</small>
+    <div
+      className={`brand-logos ${centered ? 'w-100' : ''}`}
+      aria-label="CNEISI 2026 - UTN FRSF"
+    >
+      <img
+        src={cneisiLogo}
+        alt="Logo CNEISI 2026"
+        className={`brand-logo-cneisi ${large ? 'large' : ''}`}
+      />
+      {showUtn ? (
+        <img
+          src={utnLogo}
+          alt="UTN Facultad Regional San Francisco"
+          className={`brand-logo-utn ${large ? 'large' : ''}`}
+        />
+      ) : null}
     </div>
-  )
+  );
 }

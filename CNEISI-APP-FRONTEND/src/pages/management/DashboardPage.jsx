@@ -1,30 +1,26 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../../components/ui/PageShell';
 
+const cards = [
+  { to: '/management/whitelist', title: 'Lista Blanca', desc: 'Gestionar alumnos habilitados' },
+  { to: '/management/admins', title: 'Administradores', desc: 'ABM de cuentas admin' },
+  { to: '/management/activities', title: 'Actividades', desc: 'Charlas y talleres del evento' },
+  { to: '/management/metrics', title: 'Métricas', desc: 'Estadísticas del congreso' },
+  { to: '/scanner', title: 'Escáner QR', desc: 'Control de asistencia' },
+];
+
 export default function DashboardPage() {
   return (
     <PageShell title="Panel de gestión" description="Administrá el contenido del congreso CNEISI">
-      <div className="dashboard-grid">
-        <Link to="/management/whitelist" className="dashboard-card glass-card">
-          <h3>Lista Blanca</h3>
-          <p>Gestionar alumnos habilitados</p>
-        </Link>
-        <Link to="/management/admins" className="dashboard-card glass-card">
-          <h3>Administradores</h3>
-          <p>ABM de cuentas admin</p>
-        </Link>
-        <Link to="/management/activities" className="dashboard-card glass-card">
-          <h3>Actividades</h3>
-          <p>Charlas y talleres del evento</p>
-        </Link>
-        <Link to="/management/metrics" className="dashboard-card glass-card">
-          <h3>Métricas</h3>
-          <p>Estadísticas del congreso</p>
-        </Link>
-        <Link to="/scanner" className="dashboard-card glass-card">
-          <h3>Escáner QR</h3>
-          <p>Control de asistencia</p>
-        </Link>
+      <div className="row g-3">
+        {cards.map((card) => (
+          <div key={card.to} className="col-md-6 col-xl-4">
+            <Link to={card.to} className="glass-card p-4 d-block h-100 text-decoration-none">
+              <h3 className="h5 fw-bold text-warning mb-2">{card.title}</h3>
+              <p className="text-secondary mb-0">{card.desc}</p>
+            </Link>
+          </div>
+        ))}
       </div>
     </PageShell>
   );

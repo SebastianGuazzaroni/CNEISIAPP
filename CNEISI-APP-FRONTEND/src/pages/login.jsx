@@ -29,12 +29,12 @@ export default function LoginPage() {
 
   return (
     <main className="auth-screen">
-      <Logo large />
-      <form className="auth-card glass-card login-form" onSubmit={handleSubmit}>
-        <h1>Iniciar sesión</h1>
+      <Logo large showUtn centered />
+      <form className="glass-card p-4 w-100 d-flex flex-column gap-3" style={{ maxWidth: '420px' }} onSubmit={handleSubmit}>
+        <h1 className="h4 fw-bold mb-0">Iniciar sesión</h1>
         <input
           aria-label="Email"
-          className={error ? 'input-error' : ''}
+          className={`form-control ${error ? 'is-invalid' : ''}`}
           placeholder="Email"
           type="email"
           value={form.email}
@@ -43,17 +43,18 @@ export default function LoginPage() {
         />
         <input
           aria-label="Contraseña"
+          className="form-control"
           placeholder="Contraseña"
           type="password"
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
           required
         />
-        {error ? <span className="form-error">{error}</span> : null}
-        <button className="primary-button" type="submit">
+        {error ? <span className="text-danger small">{error}</span> : null}
+        <button className="btn btn-cneisi" type="submit">
           Iniciar sesión
         </button>
-        <Link to="/welcome" className="text-link">
+        <Link to="/welcome" className="text-link text-center">
           Volver
         </Link>
       </form>

@@ -92,14 +92,14 @@ export default function WhitelistPage() {
         title="Lista Blanca"
         description="Gestionar alumnos habilitados para acceder al congreso"
         actions={
-          <button type="button" className="primary-button" onClick={openCreate}>
+          <button type="button" className="btn btn-cneisi" onClick={openCreate}>
             Nuevo registro
           </button>
         }
       >
-        <div className="table-toolbar">
+        <div className="mb-3">
           <input
-            className="search-input"
+            className="form-control"
             placeholder="Buscar por nombre o email..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -107,34 +107,36 @@ export default function WhitelistPage() {
         </div>
 
         {showForm ? (
-          <form className="form-card glass-card" onSubmit={handleSubmit}>
-            <h3>{editingId ? 'Editar registro' : 'Nuevo registro'}</h3>
+          <form className="glass-card p-4 d-flex flex-column gap-3 mb-3" onSubmit={handleSubmit}>
+            <h3 className="h5 fw-bold">{editingId ? 'Editar registro' : 'Nuevo registro'}</h3>
             <input
+              className="form-control"
               placeholder="Nombre completo"
               value={form.nombreApellido}
               onChange={(event) => setForm({ ...form, nombreApellido: event.target.value })}
               required
             />
             <input
+              className="form-control"
               placeholder="Email"
               type="email"
               value={form.email}
               onChange={(event) => setForm({ ...form, email: event.target.value })}
               required
             />
-            <div className="form-actions">
-              <button type="submit" className="primary-button">
+            <div className="d-flex gap-2">
+              <button type="submit" className="btn btn-success">
                 Guardar
               </button>
-              <button type="button" onClick={() => setShowForm(false)}>
+              <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>
                 Cancelar
               </button>
             </div>
           </form>
         ) : null}
 
-        <div className="data-table glass-card">
-          <table>
+        <div className="glass-card p-0 overflow-auto">
+          <table className="table table-hover mb-0">
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -148,11 +150,11 @@ export default function WhitelistPage() {
                   <tr key={entry.id}>
                     <td>{entry.nombreApellido}</td>
                     <td>{entry.email}</td>
-                    <td className="table-actions-cell">
-                      <button type="button" onClick={() => openEdit(entry)}>
+                    <td className="d-flex gap-2">
+                      <button type="button" className="btn btn-sm btn-outline-cneisi" onClick={() => openEdit(entry)}>
                         Editar
                       </button>
-                      <button type="button" className="danger-button" onClick={() => askDelete(entry)}>
+                      <button type="button" className="btn btn-sm btn-danger" onClick={() => askDelete(entry)}>
                         Eliminar
                       </button>
                     </td>
@@ -174,6 +176,7 @@ export default function WhitelistPage() {
       </PageShell>
 
       <ConfirmDialog
+        destructive
         title={confirm?.title}
         onConfirm={confirm?.action}
         onCancel={() => setConfirm(null)}

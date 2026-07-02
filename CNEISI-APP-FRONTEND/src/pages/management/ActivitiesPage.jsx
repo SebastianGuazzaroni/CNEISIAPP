@@ -30,7 +30,7 @@ export default function ActivitiesPage() {
         title="Actividades"
         description="Charlas y talleres del congreso"
         actions={
-          <Link to="/management/activities/new" className="primary-button">
+          <Link to="/management/activities/new" className="btn btn-cneisi">
             Nueva actividad
           </Link>
         }

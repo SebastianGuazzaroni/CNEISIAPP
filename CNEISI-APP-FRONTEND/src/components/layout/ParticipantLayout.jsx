@@ -9,9 +9,9 @@ const navItems = [
 
 export default function ParticipantLayout() {
   return (
-    <div className="participant-layout">
+    <div className="min-vh-100 d-flex flex-column">
       <AppHeader />
-      <main className="participant-main">
+      <main className="flex-grow-1 p-3 pb-5 mb-4">
         <Outlet />
       </main>
       <nav className="bottom-nav" aria-label="Navegación participante">
@@ -20,7 +20,7 @@ export default function ParticipantLayout() {
             key={item.to}
             to={item.to}
             end={item.end}
-            className={({ isActive }) => (isActive ? 'bottom-nav-link active' : 'bottom-nav-link')}
+            className={({ isActive }) => `nav-pill-link text-center ${isActive ? 'active' : ''}`}
           >
             {item.label}
           </NavLink>

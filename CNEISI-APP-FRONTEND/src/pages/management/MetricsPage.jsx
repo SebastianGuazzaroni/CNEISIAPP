@@ -32,26 +32,25 @@ export default function MetricsPage() {
     loadMetrics();
   }, []);
 
+  const items = [
+    { label: 'Participantes', value: metrics.participants },
+    { label: 'Administradores', value: metrics.admins },
+    { label: 'Actividades', value: metrics.events },
+    { label: 'Inscripciones', value: metrics.inscriptions },
+  ];
+
   return (
     <>
       <PageShell title="Métricas" description="Estadísticas en tiempo real del congreso">
-        <div className="metrics-grid">
-          <div className="metric-card glass-card">
-            <span>Participantes</span>
-            <strong>{metrics.participants}</strong>
-          </div>
-          <div className="metric-card glass-card">
-            <span>Administradores</span>
-            <strong>{metrics.admins}</strong>
-          </div>
-          <div className="metric-card glass-card">
-            <span>Actividades</span>
-            <strong>{metrics.events}</strong>
-          </div>
-          <div className="metric-card glass-card">
-            <span>Inscripciones</span>
-            <strong>{metrics.inscriptions}</strong>
-          </div>
+        <div className="row g-3">
+          {items.map((item) => (
+            <div key={item.label} className="col-md-6 col-xl-3">
+              <div className="glass-card p-4 h-100">
+                <span className="text-secondary">{item.label}</span>
+                <strong className="d-block display-6 text-warning mt-2">{item.value}</strong>
+              </div>
+            </div>
+          ))}
         </div>
       </PageShell>
       <Toast message={toast} />

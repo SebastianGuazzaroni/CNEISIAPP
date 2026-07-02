@@ -45,21 +45,19 @@ export default function TimelinePage() {
     }
   }
 
-  const availableEvents = events.filter((event) => !enrolledIds.has(String(event.id)));
-
   return (
     <>
-      <EventCards title="CRONOGRAMA" events={events} mode="schedule" />
-      {availableEvents.length ? (
-        <EventCards
-          title="INSCRIBIRSE A CHARLAS"
-          events={availableEvents}
-          mode="enroll"
-          onAction={handleEnroll}
-        />
-      ) : null}
-      <p className="scanner-hint">
-        <Link to="/participant/inscriptions">Ir a Mis Inscripciones</Link>
+      <EventCards
+        title="CRONOGRAMA"
+        events={events}
+        mode="timeline"
+        enrolledIds={enrolledIds}
+        onAction={handleEnroll}
+      />
+      <p className="text-center mt-3">
+        <Link to="/participant/inscriptions" className="text-link">
+          Ir a Mis Inscripciones
+        </Link>
       </p>
       <Toast message={toast} />
     </>

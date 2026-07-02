@@ -32,16 +32,16 @@ export default function FeedbackForm({ eventoId, onSuccess, onError }) {
   }
 
   return (
-    <form className="feedback-form glass-card" onSubmit={handleSubmit}>
-      <h4>Feedback del evento</h4>
-      <p className="scanner-hint">Calificá cada aspecto de 0 a 5</p>
-      <div className="feedback-scores">
+    <form className="glass-card p-3 d-flex flex-column gap-3" onSubmit={handleSubmit}>
+      <h4 className="h6 fw-bold mb-0">Feedback del evento</h4>
+      <p className="text-secondary small mb-0">Calificá cada aspecto de 0 a 5</p>
+      <div className="d-flex flex-column gap-2">
         {FEEDBACK_QUESTIONS.map((question, index) => {
           const key = `respuesta${index + 1}`;
           return (
-            <label key={key} className="feedback-score-row">
-              <span>{question}</span>
-              <select value={scores[key]} onChange={(event) => updateScore(key, event.target.value)}>
+            <label key={key} className="d-flex justify-content-between align-items-center gap-3">
+              <span className="small">{question}</span>
+              <select className="form-select form-select-sm w-auto" value={scores[key]} onChange={(event) => updateScore(key, event.target.value)}>
                 {[0, 1, 2, 3, 4, 5].map((score) => (
                   <option key={score} value={score}>
                     {score}
@@ -52,7 +52,7 @@ export default function FeedbackForm({ eventoId, onSuccess, onError }) {
           );
         })}
       </div>
-      <button type="submit" className="primary-button" disabled={submitting}>
+      <button type="submit" className="btn btn-success" disabled={submitting}>
         Enviar feedback
       </button>
     </form>
