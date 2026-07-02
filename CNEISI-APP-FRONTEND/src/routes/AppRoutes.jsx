@@ -23,12 +23,14 @@ import ActivitiesPage from '../pages/management/ActivitiesPage';
 import ActivityFormPage from '../pages/management/ActivityFormPage';
 import MetricsPage from '../pages/management/MetricsPage';
 
+// Redirige al usuario según su estado de autenticación y rol.
 function RootRedirect() {
   const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Navigate to="/welcome" replace />;
   return <Navigate to={getHomeRoute(user?.rol)} replace />;
 }
 
+// Evita que un usuario autenticado acceda a pantallas de invitado como login o registro.
 function GuestOnly({ children }) {
   const { isAuthenticated, user } = useAuth();
   if (isAuthenticated) {
@@ -47,6 +49,7 @@ export default function AppRoutes() {
         <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
+        {/* Rutas solo para participantes autenticados */}
         <Route element={<ProtectedRoute roles={['participant']} />}>
           <Route element={<ParticipantLayout />}>
             <Route path="/participant" element={<HomePage />} />

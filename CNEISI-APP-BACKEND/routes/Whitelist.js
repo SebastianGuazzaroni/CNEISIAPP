@@ -8,6 +8,7 @@ const { handleValidation } = require('../middleware/validate');
 
 const router = express.Router();
 
+// Todas las operaciones con la whitelist sólo pueden realizarlas superadministradores.
 router.use(auth, requireRole('superadmin'));
 
 const createValidators = [

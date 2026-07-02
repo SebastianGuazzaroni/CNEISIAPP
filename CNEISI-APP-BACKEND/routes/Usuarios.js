@@ -65,6 +65,7 @@ router.post('/', usuarioCreateValidators, handleValidation, async (req, res) => 
   }
 });
 
+// Todas las rutas de gestión de usuarios sólo pueden accederlas superadministradores.
 router.get('/', auth, requireRole('superadmin'), async (_req, res) => {
   try {
     const usuarios = await Usuario.findAll({ attributes: { exclude: ['password'] } });

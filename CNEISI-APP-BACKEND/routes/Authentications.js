@@ -28,6 +28,7 @@ router.post('/', async (req, res) => {
 
     const rol = normalizeRole(usuario.rol);
     if (rol === 'participant') {
+      // Los participantes deben estar en la whitelist para poder iniciar sesión.
       const allowed = await isWhitelisted(normalizedEmail);
       if (!allowed) {
         return res.status(403).json({ message: 'Email no autorizado. Contactá al organizador del evento.' });
@@ -38,6 +39,7 @@ router.post('/', async (req, res) => {
     delete data.password;
     data.rol = rol;
 
+    // Genera el JWT con los datos de usuario necesarios para la sesión.
     const token = signToken(data);
     res.json({ user: data, token });
   } catch (error) {

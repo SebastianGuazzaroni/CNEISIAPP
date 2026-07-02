@@ -57,6 +57,8 @@ router.get('/:id', param('id').isInt().withMessage('El id debe ser un número.')
   }
 });
 
+// Creación, edición y eliminación de eventos sólo están abiertas a superadministradores.
+// El middleware auth verifica el JWT y requireRole valida el rol del usuario.
 router.post('/', auth, requireRole('superadmin'), eventoCreateValidators, handleValidation, async (req, res) => {
   try {
     const payload = {

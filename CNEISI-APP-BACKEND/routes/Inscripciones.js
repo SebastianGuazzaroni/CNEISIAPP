@@ -9,6 +9,10 @@ const { VALID_ESTADOS } = require('../utils/feedback');
 
 const router = express.Router();
 
+// Todas las rutas de inscripciones requieren autenticación.
+// Los participantes sólo pueden crear inscripciones con su propio usuario.
+router.use(auth);
+
 const inscripcionCreateValidators = [
   body('eventoId').isInt().withMessage('eventoId es requerido y debe ser un número.'),
   body('estado').optional().trim().notEmpty().withMessage('El estado no puede estar vacío.'),
